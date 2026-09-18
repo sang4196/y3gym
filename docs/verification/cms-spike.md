@@ -289,3 +289,15 @@ SP-01·05·11의 이전 서버 PASS 기록은 유지하며 자동화 도구는 �
 다음은 제목에 `TEST-DRAFT-01`, 본문 끝에 `TEST-BODY-01`을 추가하고 Save draft 후 Posts에서 재열기·Preview를 확인한 뒤 시크릿 공개 HTML에 두 표식이 없는지 비교하는 최소 사용자 검사다. 이미지 업로드는 다음 단계다. 설치된 Wagtail 7.4.3의 `generic/form.html`은 하단 footer에 액션 메뉴를 배치하고, snippet `action_menu/save.html`은 DraftStateMixin을 쓰는 일반 편집에서 `Save draft`로 표시한다. 이 안내는 소스 확인이며 실제 화면 관찰이 아니다. 저장 전 공개 HTML/JSON 원문 기준을 보존하지 못한 경우 bytes/JSON 불변 검증까지 PASS로 주장하지 않는다.
 
 이번 작업은 문서 두 파일만 갱신했고 사용자 서버·계정·DB·미디어를 자동 수정하지 않았다. Publish/Unpublish·테스트 재실행·Git staging/commit/push는 하지 않았다.
+
+### 최신 사용자 보고 — 텍스트 수정 초안 저장 후 공개본 유지
+
+직전 검사 전체에 사용자가 “ㅇㅇ 다 됨”이라고 명시적으로 답했다. 해당 검사는 A 제목 끝에 `TEST-DRAFT-01`, 본문 끝에 `TEST-BODY-01` 추가 → Save draft → A 재열기 및 Preview에서 두 표식 유지 → 시크릿 공개 페이지 새로고침 후 `SPIKE PUBLIC A`·빨강 대표·파랑 본문 유지 및 두 표식 없음이었다. 이 범위의 **사용자 수동 관찰 확인**으로 기록한다. 사용자가 기존 시험 초안의 제목·본문을 수정하고 저장한 상태이며 원복하지 않는다. 실제 최신 리비전 ID·DB 내용은 이번에 직접 조회하지 않았다.
+
+SP-01 일부의 텍스트 편집·초안 저장·재열기, SP-05 일부의 수정 표식 Preview 표시, SP-03 관련 공개 HTML의 시각적 유지가 사용자 보고로 확인됐다. Codex 직접 실행/화면 관찰이나 SP 전체 PASS는 아니다. HTML bytes·JSON·live_revision 불변을 확인한 것으로 확대하지 않는다. 위 표의 해당 NOT_RUN은 이전 시점 기록이다. 자동화 도구 BLOCKED와 사용자 수동 일부 확인 상태는 유지한다.
+
+다음은 기존 합성 PNG를 새 자산으로 업로드·선택하고 Save draft 후 재열기/Preview 및 시크릿 공개본을 비교하는 단계다. 시각적으로 구분하려면 새 대표에 `public-body.png`(파랑), 새 본문에 `draft-cover.png`(초록)를 각각 새 자산으로 업로드할 수 있다. 파일명에 public이 있어도 새 자산의 공개 여부는 새 ID의 공개 참조에 따라 별도 판정하며, 실제 무권한 접근은 후속 검사다. 기존 원본 덮어쓰기·개인 사진·Publish/Unpublish는 사용하지 않는다.
+
+현재 `wslpath -w`가 반환한 fixture 경로는 `\\wsl.localhost\Ubuntu\home\shlee\Workspace\ai\01.codex\y3gym\experiments\cms-spike\.runtime\fixtures`이며 파일 4개 존재를 확인했다. Windows 파일 선택창에서의 접근 성공은 아직 사용자 확인 전이다. 경로를 파일 선택창 주소 표시줄에 붙여 넣어 파일을 고르게 안내하며, 접근 오류면 그대로 보고받고 환경 설정을 변경하지 않는다.
+
+아직 미검증: 새 이미지 업로드/선택·그 이후 초안 저장 비교, Bold/Italic·링크 편집, 기존 파일 덮어쓰기 비활성 UI, 공개 JSON/리비전 비교, 무권한 미리보기·파일 접근, 별도 JS 렌더링. 이번 에이전트 작업은 보고서·작업 기록만 갱신했고 서버·계정·DB·미디어를 자동 수정하거나 테스트/도구 장애 재진단·Git 쓰기 작업을 하지 않았다.
