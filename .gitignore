@@ -1,0 +1,11 @@
+# SPIKE-01 local environment and generated artifacts only
+/experiments/cms-spike/.venv/
+/experiments/cms-spike/.runtime/
+/experiments/cms-spike/.cache/
+/experiments/cms-spike/.env
+/experiments/cms-spike/.env.*
+/experiments/cms-spike/**/*.sqlite3
+/experiments/cms-spike/**/*.sqlite3-*
+/experiments/cms-spike/**/__pycache__/
+/experiments/cms-spike/**/*.pyc
+/experiments/cms-spike/**/*.log

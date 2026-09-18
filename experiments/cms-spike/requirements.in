@@ -1,0 +1,6 @@
+# SPIKE-01 candidates only; not production adoption.
+Django==5.2.17
+wagtail==7.4.3
+Pillow==12.3.0
+tzdata
+bleach

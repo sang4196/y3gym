@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>{{ post.title }}</title></head>
+<body>
+{% if preview %}<p>SPIKE-01 — PRIVATE PREVIEW — TEST CONTENT ONLY</p>{% endif %}
+<article>
+  <h1>{{ post.title }}</h1><p>{{ post.category }}</p>
+  {% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="{{ post.cover_image.alt }}" width="{{ post.cover_image.width }}" height="{{ post.cover_image.height }}">{% endif %}
+  <div id="body">{{ post.body_html|safe }}</div>
+</article>
+</body></html>
