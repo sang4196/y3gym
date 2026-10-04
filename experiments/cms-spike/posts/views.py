@@ -20,6 +20,12 @@ def post_html(request, pk):
 
 
 @require_safe
+def post_client(request, pk):
+    # Empty client shell: only the public JSON endpoint selects content.
+    return render(request, "posts/client.html", {"post_id": pk})
+
+
+@require_safe
 def post_json(request, pk):
     return JsonResponse({"data": serialize_post(published_post(pk), request)})
 

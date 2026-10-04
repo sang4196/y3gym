@@ -1,0 +1,22 @@
+{% load static %}<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPIKE-01 공개 JSON 표시 시험</title>
+  <script defer src="{% static 'posts/public-client.js' %}"></script>
+</head>
+<body>
+  <main id="public-client" data-post-id="{{ post_id }}">
+    <p>SPIKE-01 — 합성 자료 · 공개 JSON 표시 시험</p>
+    <p id="client-status" role="status" aria-live="polite">공개 JSON을 불러오는 중…</p>
+    <noscript>이 시험은 JavaScript가 필요합니다.</noscript>
+    <article id="client-post" hidden>
+      <h1 id="client-title"></h1>
+      <p id="client-category"></p>
+      <div id="client-cover"></div>
+      <div id="client-body"></div>
+    </article>
+  </main>
+</body>
+</html>

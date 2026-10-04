@@ -278,6 +278,25 @@ class CmsSpikeTests(TestCase):
         self.assertEqual(self.post(self.admin_url("edit", self.a), self.form_data("NEW COVER", self.old_body, replacement, True)).status_code, 302)
         self.assertIn(str(replacement.pk), self.public_data()["cover_image"]["url"])
 
+    def test_sp11_client_shell_uses_public_json_without_ssr(self):
+        before = self.public_data()
+        self.draft()
+        for client in (self.anon, self.client):
+            response = client.get(reverse("post-client", args=[self.a.pk]))
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("no-store", response["Cache-Control"])
+            soup = BeautifulSoup(response.content, "html.parser")
+            self.assertEqual(soup.select_one("#public-client")["data-post-id"], str(self.a.pk))
+            self.assertTrue(soup.select_one("#client-post").has_attr("hidden"))
+            self.assertEqual(soup.select_one("#client-body").text, "")
+            self.assertNotContains(response, "PUBLIC A")
+            self.assertNotContains(response, "DRAFT A")
+            self.assertEqual(self.public_data(client=client), before)
+        # Unknown ID still returns a shell; its JSON request supplies the 404.
+        self.assertEqual(self.anon.get(reverse("post-client", args=[999999])).status_code, 200)
+        self.assertEqual(self.anon.get(reverse("post-json", args=[999999])).status_code, 404)
+        self.assertEqual(self.anon.post(reverse("post-client", args=[self.a.pk])).status_code, 405)
+
     def test_sp11_json_body_rendering_and_links_server(self):
         body = self.public_data()["body_html"]
         soup = BeautifulSoup(body, "html.parser")
