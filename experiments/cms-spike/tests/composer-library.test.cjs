@@ -28,12 +28,16 @@ function setup() {
   assert.ok(imageStart > 0 && imageEnd > imageStart);
   vm.runInContext('globalThis.InstalledImageSource=' + bundle.slice(imageStart + 'ImageModalWorkflowSource:'.length, imageEnd), ctx);
   ctx.draftail = { ImageModalWorkflowSource: ctx.InstalledImageSource };
+  const toolbar = bundle.match(/wt=([\s\S]*?),Et=/);
+  assert.ok(toolbar && bundle.includes('Toolbar:()=>wt'), 'installed native toolbar export');
+  vm.runInContext('globalThis.Draftail={Toolbar:' + toolbar[1] + '}', ctx);
   const listeners = {};
   ctx.document = { addEventListener: (name, fn) => listeners[name] = fn };
   vm.runInContext(fs.readFileSync(path.join(root, 'posts/static/posts/composer.js'), 'utf8'), ctx);
   function widget() {
     const options = { entityTypes: [{ type: 'IMAGE', chooserUrls: { imageChooser: '/admin/images/chooser/' } }] };
     listeners['w-draftail:init']({ target: { matches: () => true }, detail: options });
+    assert.equal(options.topToolbar, ctx.Draftail.Toolbar);
     return options.entityTypes[0];
   }
   // Execute the installed onRequestSource method to retain its LINK-at-caret behavior.
@@ -75,7 +79,7 @@ function open(env, image, editorState, blockKey) {
     const block = content.getBlockForKey(blockKey), entityKey = block.getEntityAt(0);
     const element = image.block({ block, blockProps: { entityKey, entity: content.getEntity(entityKey),
       onEditEntity: () => start(entityKey, content.getEntity(entityKey)), onRemoveEntity() {} } });
-    element.props.children[1].props.children[1].props.children[0].props.onClick();
+    element.props.children[1].props.children.props.children[2].props.children[0].props.onClick();
   } else {
     env.ctx.requestSource.call({ getEditorState: () => editorState,
       toggleSource: (type, key, entity) => { assert.equal(type, 'IMAGE'); start(key, entity); } }, 'IMAGE');

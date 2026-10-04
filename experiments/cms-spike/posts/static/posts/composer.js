@@ -64,60 +64,26 @@
       return h('figure', { className: 'spike-body-image', contentEditable: false },
         h('img', { src, alt: alt || '' }),
         h('figcaption', null,
+        h('details', { className: 'spike-body-image__options' },
+          h('summary', null, '이미지 옵션'),
           h('span', null, alt ? `이미지 설명: ${alt}` : '설명 없는 장식 이미지'),
           h('div', { className: 'spike-body-image__actions' },
             h('button', { type: 'button', className: 'button button-small', onClick: replace }, '이미지 선택·교체'),
-            h('button', { type: 'button', className: 'button button-small button-secondary', onClick: onRemoveEntity }, '본문에서 제거'))));
+            h('button', { type: 'button', className: 'button button-small button-secondary', onClick: onRemoveEntity }, '본문에서 제거')))));
     }
     return { source: ChooseImageSource, block: BodyImage };
-  }
-
-  function Toolbar(props) {
-    const button = (control, action, pressed) => h('button', {
-      key: control.type, type: 'button', className: 'spike-format-button',
-      'aria-pressed': pressed,
-      onMouseDown: (event) => event.preventDefault(),
-      onClick: () => action(control.type),
-    }, names[control.type]);
-    // Normal Tab/Shift+Tab and Enter/Space work without moving the mouse selection.
-    return h('div', { className: 'spike-format-bar', role: 'group', 'aria-label': '본문 서식' },
-      ...props.inlineStyles.map((item) => button(item, props.toggleInlineStyle, props.currentStyles.has(item.type))),
-      ...props.blockTypes.map((item) => button(item, props.toggleBlockType, props.currentBlock === item.type)),
-      ...props.entityTypes.map((item) => button(item, props.onRequestSource, undefined)));
-  }
-
-  const names = {
-    'header-two': '소제목', BOLD: '굵게', ITALIC: '기울임',
-    'ordered-list-item': '번호 목록', 'unordered-list-item': '글머리 목록',
-    LINK: '링크', IMAGE: '이미지 넣기',
-  };
-  function label(control) {
-    return names[control.type]
-      ? { ...control, icon: null, label: names[control.type], description: names[control.type] }
-      : control;
   }
 
   // Capture runs before Wagtail's document bubble listener initializes React.
   document.addEventListener('w-draftail:init', (event) => {
     if (!event.target.matches('[data-spike-post-editor]')) return;
     const options = event.detail;
-    options.topToolbar = Toolbar;
+    options.topToolbar = window.Draftail.Toolbar;
     options.placeholder = '여기에 본문을 입력하세요.';
-    options.blockTypes = (options.blockTypes || []).map(label);
-    options.inlineStyles = (options.inlineStyles || []).map(label);
     const imageUI = createImageUI();
     options.entityTypes = (options.entityTypes || []).map((control) => control.type === 'IMAGE'
-      ? { ...label(control), ...imageUI }
-      : label(control));
+      ? { ...control, ...imageUI }
+      : control);
   }, true);
 
-  document.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-spike-preview]');
-    if (!button) return;
-    // Reuse the official controller: it POSTs unsaved form data then opens preview.
-    // No direct GET bypass, session reading, or separate preview state implementation.
-    const link = document.querySelector('.w-preview [data-w-preview-target="newTab"]');
-    if (link) link.click();
-    else window.alert('이 화면에서 미리보기를 사용할 수 없습니다. 기존 Preview 메뉴를 확인하세요.');
-  });
 })();

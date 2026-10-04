@@ -2,7 +2,7 @@
 
 실행·확인일: **2026-09-18**. 범위: `experiments/cms-spike`의 Post 하나와 CMS 이미지, WSL Ubuntu, 로컬 SQLite·파일 저장소.
 
-**현재 상태(2026-10-04):** §19 참조. 사용자 진행 지시에 따라 검토 완료 코드 b6bfbdf로 루프백 서버를 재시작했다. 새 PID417652, composer JS/CSS HTTP200 및 checkout 바이트 일치, 적용 전후 DB·미디어 불변. 실제 새 UI 클릭/입력·사용성은 아직 미검증이며 자동 브라우저 도구 BLOCKED다.
+**현재 상태(2026-10-04):** §20 참조. 사용자 Paragraph 입력 요청에 맞춰 기본 Draftail 아이콘 툴바·연속 본문·기존 우측 Preview로 간소화하고 PID422764에 적용했다. 서버17개/JS7개 PASS. 실제 클릭·IME·사용성은 미검증, 공식 브라우저 도구 BLOCKED. 데이터 핵심 참조/미디어는 재시작 전후 보존됐으나 전체 DB 해시 불변은 주장하지 않는다.
 
 후속 브라우저 검증(2026-09-18): **자동화 도구 BLOCKED / 수동 일부 확인(사용자 보고)**. 아래 §1~9는 이전 서버 검증 기록이며 이번 재실행 결과가 아니다. 도구 진단은 §10~11, 최신 수동 관찰 결과는 §13을 따른다.
 
@@ -477,3 +477,35 @@ Git 검토 담당자가 초기 UI의 실질 결함2건을 재현해 staging/comm
 증거(Git 제외): `experiments/cms-spike/.runtime/composer-apply-20261004T114740438915Z/`의 before.json, after.json, results.json, server-process.json, server.log. 기존 서버 로그/증거는 보존했다. 이번 문서 변경은 이 보고서와 tasks/current.md뿐이며 Git staging/commit/push 없음.
 
 사용자 다음 동작: 기존 관리자 A 편집 화면을 새로고침해 상단 서식 버튼·넓은 본문·이미지 선택/교체·본문에서 제거·새 탭 미리보기를 확인한다. 실제 클릭·키보드/한글입력·공유 이미지 배치 교체·취소·새 탭 Preview는 미검증이며 도구 BLOCKED 유지. URL은 `http://127.0.0.1:8765/admin/`. 종료가 필요할 때는 PID417652의 cwd/명령을 다시 확인하고 **그 서버만** `kill -INT 417652`로 종료한다(PID 재사용 시 실행 금지). 전체 제품 구현·상용 배포·정책 승인으로 확대하지 않는다.
+
+
+## 20. Paragraph 입력 중심 재작업·로컬 적용 — 2026-10-04
+
+사용자가 영상의 “paragraph형식으로 글을쓰는게 사용자에게 익숙한 ui같음”이라고 특정하여 재작업했다. 설계자 제공 storyboard sheet7~9를 직접 확인했고, 특히 sheet9(6:45 부근)의 얇은 아이콘 툴바·본문 입력·우측 Preview를 참고했다. 영상 전체 재생/음성 확인은 아니다. 블록 메뉴/Starter 전체/StreamField 도입은 요구로 확장하지 않았다.
+
+### 최소 구현
+
+설치된 Wagtail7.4.3 번들의 `window.Draftail.Toolbar` export와 topToolbar 옵션 적용을 확인해 **기본 Toolbar를 본문 위에서 직접 사용**한다. 기본 icon/description/control 옵션은 그대로 두며, 기존 큰 한국어 버튼을 생성하던 커스텀 Toolbar/label 매핑은 제거했다. CSS는 Post에만 적용하고 본문 최소12rem(작은 창10rem)·기본 툴바 줄바꿈만 유지한다. 추가 외곽선·중첩 스크롤·본문 작성 바·새 탭 Preview 버튼/클릭 위임·장문의 HelpPanel을 제거했다. 사용하지 않는 도움말 템플릿도 제거했다. 기존 Wagtail 우측 Preview/기본 관리자 흐름은 그대로다.
+
+이미지 아래에는 접힌 native details/summary **이미지 옵션**만 보이며 열면 `이미지 선택·교체`, `본문에서 제거`와 설명을 확인할 수 있다. 이미지 추가는 기본 툴바의 이미지 아이콘을 쓴다. §18의 정확한 blockKey 대상 지정·독립 entity 교체·LINK 커서 삽입·취소 처리 로직은 유지했다. 대표 이미지는 별도 필드와 한 줄 설명으로 구분한다.
+
+RichTextField/필드명/ContentState 요청 형식/저장 HTML/리비전/이미지 권한/공개 DTO는 변경하지 않았다. StreamField·본문 분할·새 의존성·데이터 변환은 없다. 열린 구버전 폼도 같은 요청 형식을 사용할 수 있도록 하위호환을 유지했다.
+
+### 검증
+
+- **서버17개 PASS, 15.032s**, Django check 문제0건. 기존 이미지/공개/Preview 회귀 유지. 위젯 회귀에 이전 폼과 같은 payload를 새 서버 코드로 저장하여 초안 제목/이미지 유지·live revision/공개 JSON 불변을 확인하는 검사를 보강했다. 기존 테스트용 메모리 DB만 사용했으며 사용자 폼을 실제 저장한 것은 아니다.
+- **JS7개 PASS**: 실제 설치 라이브러리 상태 전환6개(링크 안 삽입, 공유 이미지 첫/두 배치 독립 교체, 각 취소 및 이후 삽입) 유지. 모의 연결1개에서 native Toolbar 참조·원래 컨트롤 옵션·접힌 이미지 옵션·새 탭 클릭 위임 제거를 검사한다. 실제 라이브러리 로더도 설치된 Toolbar export를 대조한다. 이전 별도 새 탭 Preview 테스트는 해당 기능 제거와 함께 제거했다.
+- `makemigrations --check --dry-run`: No changes detected. JS syntax/git diff --check 통과.
+- 실제 DOM 렌더링·기본 툴바 키보드 접근·연속 한글/IME 입력·이미지 옵션 클릭/교체/취소·우측 Preview 사용성·작은 창은 **NOT_RUN**. 위 시험을 브라우저 PASS로 보고하지 않는다. 공식 Computer Use의 기존 URI 장애는 BLOCKED이며 반복 호출하지 않았다.
+
+테스트 증거: `experiments/cms-spike/.runtime/paragraph-20261004T121851887348Z/`의 js.log, server.log(테스트 로그), migration.log, before-tests.json/after-tests.json. 테스트 구간 private-media 해시는 동일하지만 SQLite 전체 해시는 달랐으므로 DB 전체 불변 PASS로 처리하지 않는다. 계정/세션/비밀값을 조사하지 않았다.
+
+### 적용·보존·다음 확인
+
+기존 PID417652의 소유 uid/cwd/명령과 127.0.0.1:8765 리스너를 확인 후 해당 프로세스만 SIGINT로 종료했다. 첫 재시작 시도는 신규 서버 로그명이 기존 테스트 server.log와 겹쳐 `open('xb')`에서 중단됐다. 기존 로그를 덮어쓰지 않았으며 포트가 비어 있음을 확인하고 새 증거 폴더·다른 로그명으로 다시 시작했다. **새 PID422764**, 기존 venv·동일 README 명령 `runserver 127.0.0.1:8765 --noreload --insecure`, loopback만 리스닝. 사용자 확인을 위해 유지한다. 브라우저 탭 새로고침/이동·계정·콘텐츠 저장·migrate·seed·publish/unpublish·Git 쓰기 없음.
+
+로그인 HTTP200은 가용성만 확인. composer JS/CSS 각200·checkout 바이트 동일. 공개 A HTML/JSON 각200이며 §16 저장 응답과 바이트 동일하다. 재시작 직전/후 Post 참조·모든 리비전 content 해시·이미지 목록·private-media 목록/해시는 동일하고 A 공개1/최신12, B 공개3/최신3이다. 이전 기록11보다 최신 초안이 늘어난 상태를 새 기준으로 존중했으며 원복하지 않았다. **전체 SQLite 해시는 다르므로 계정/세션 등 포함 DB 전체 불변은 미확정**이다. 해시 차이를 콘텐츠 손실로 단정하지 않으며 비밀값 조사로 확대하지 않는다.
+
+적용 증거: `experiments/cms-spike/.runtime/paragraph-apply-20261004T122005146194Z/`의 server-process.json, development-server.log, after-apply.json, results.json, public-after.html/json. 비교용 before-apply.json은 위 테스트 증거 폴더에 보존했다. 기존 로그와 증거는 유지했다.
+
+사용자는 입력 중인 내용이 있으면 먼저 Save draft한 뒤 A 편집 화면을 새로고침해 기본 아이콘 툴바·자연스러운 연속 입력·접힌 이미지 옵션·우측 Preview를 확인한다. 구버전 화면을 강제로 이동시키지 않았다. URL `http://127.0.0.1:8765/admin/`. 종료가 필요하면 PID422764의 cwd/명령/소유권 확인 후 그 프로세스만 `kill -INT 422764`로 종료한다. ADR/P-01~04/A-01은 Proposed, 전체 제품·운영 배포는 미승인이다.

@@ -1,40 +1,16 @@
-/* Scoped to the Post body panel/widget. Selectors checked against Wagtail 7.4.3. */
+/* Post-only sizing; native Wagtail icons, tooltips, colors and focus styling remain. */
 .spike-post-body.w-panel__wrapper,
 .spike-post-body .w-panel__wrapper,
 .spike-post-body .w-field__wrapper { max-width: none; }
 .spike-post-composer { width: 100%; min-width: 0; }
-.spike-post-composer__actions,
-.spike-body-image__actions { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem; }
-.spike-post-composer__actions { justify-content: space-between; margin-bottom: .75rem; }
-.spike-post-composer .Draftail-Editor {
-  border: 1px solid var(--w-color-border-field-default);
-  border-radius: .375rem;
-  background: var(--w-color-surface-field);
-}
-.spike-post-composer .spike-format-bar {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--w-color-border-field-default);
-  padding: .375rem;
-}
-.spike-post-composer .spike-format-bar { gap: .25rem; }
-.spike-post-composer .spike-format-button {
-  min-height: 2.75rem; padding: .375rem .625rem; cursor: pointer;
-  border: 1px solid var(--w-color-border-field-default); border-radius: .25rem;
-  background: var(--w-color-surface-field); color: var(--w-color-text-context);
-}
-.spike-post-composer .spike-format-button[aria-pressed="true"] {
-  background: var(--w-color-surface-button-default); color: var(--w-color-text-button);
-  text-decoration: underline;
-}
-.spike-post-composer .DraftEditor-root { max-height: 65vh; overflow: auto; }
-.spike-post-composer .public-DraftEditor-content { min-height: 24rem; padding: 1rem; }
-.spike-post-composer .spike-body-image { margin: 1rem 0; padding: .75rem; border: 1px solid var(--w-color-border-field-default); }
-.spike-post-composer .spike-body-image img { display: block; max-width: 100%; max-height: 20rem; height: auto; object-fit: contain; }
-.spike-post-composer .spike-body-image figcaption { display: grid; gap: .75rem; margin-top: .75rem; overflow-wrap: anywhere; }
-.spike-post-composer button:focus-visible { outline: 3px solid var(--w-color-focus); outline-offset: 2px; }
+.spike-post-composer .Draftail-Toolbar { display: flex; flex-wrap: wrap; }
+.spike-post-composer .public-DraftEditor-content { min-height: 12rem; }
+.spike-post-composer .spike-body-image { margin: 1rem 0; }
+.spike-post-composer .spike-body-image img { display: block; max-width: 100%; height: auto; }
+.spike-post-composer .spike-body-image__options { margin-top: .25rem; font-size: .875rem; }
+.spike-post-composer .spike-body-image__options summary { cursor: pointer; }
+.spike-post-composer .spike-body-image__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+.spike-post-composer .spike-body-image__options :focus-visible { outline: 3px solid var(--w-color-focus); outline-offset: 2px; }
 @media (max-width: 600px) {
-  .spike-post-composer .public-DraftEditor-content { min-height: 16rem; padding: .75rem; }
-  .spike-post-composer .DraftEditor-root { max-height: 60vh; }
+  .spike-post-composer .public-DraftEditor-content { min-height: 10rem; }
 }

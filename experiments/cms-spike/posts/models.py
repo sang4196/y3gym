@@ -1,6 +1,6 @@
 from django.db import models
 from django.shortcuts import render
-from wagtail.admin.panels import FieldPanel, HelpPanel
+from wagtail.admin.panels import FieldPanel
 from wagtail.fields import RichTextField
 from wagtail.models import DraftStateMixin, PreviewableMixin, RevisionMixin
 from wagtail.snippets.models import register_snippet
@@ -20,20 +20,16 @@ class Post(DraftStateMixin, RevisionMixin, PreviewableMixin, models.Model):
     panels = [
         FieldPanel("title", heading="제목"),
         FieldPanel("category", heading="분류"),
-        HelpPanel(
-            template="posts/admin/body_image_help.html",
-        ),
         FieldPanel(
             "body",
             widget=PostRichTextArea,
             classname="spike-post-body",
             heading="본문",
-            help_text="상단 도구로 서식을 적용하고 이미지를 넣습니다. 기존 이미지는 아래 선택·교체 버튼으로 바꿉니다.",
         ),
         FieldPanel(
             "cover_image",
-            heading="대표 이미지 · 본문 이미지와 별도",
-            help_text="여기서 선택한 이미지는 글 상단에 표시됩니다. 본문 속 이미지는 바뀌지 않습니다.",
+            heading="대표 이미지",
+            help_text="글 상단에 표시되는 이미지입니다. 본문 이미지는 본문에서 넣습니다.",
         ),
     ]
 

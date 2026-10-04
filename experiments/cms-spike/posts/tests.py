@@ -112,7 +112,7 @@ class CmsSpikeTests(TestCase):
         custom = next(i for i, src in enumerate(scripts) if "posts/composer.js" in src)
         native = next(i for i, src in enumerate(scripts) if "wagtailadmin/js/draftail.js" in src)
         self.assertGreater(custom, native)
-        self.assertIsNotNone(soup.select_one('[data-spike-preview][type="button"]'))
+        self.assertIsNone(soup.select_one('[data-spike-preview]'))
         self.assertIsNotNone(soup.select_one('.w-preview [data-w-preview-target="newTab"]'))
         widget = PostRichTextArea(features=Post._meta.get_field("body").features)
         body = self.old_body + '<ul><li>Bullet</li></ul><ol><li>Number</li></ol>'
@@ -122,6 +122,20 @@ class CmsSpikeTests(TestCase):
         for tag in ("h2", "b", "i", "ul", "ol"):
             self.assertIsNotNone(restored_soup.find(tag))
         self.assertEqual(restored_soup.find("a")["href"], "https://example.com/")
+        # Old open forms submit the same field names and ContentState JSON. No UI
+        # version token or new field is needed after the process is restarted.
+        public_before = self.public_data()
+        live_revision = self.a.live_revision_id
+        payload = self.form_data("Legacy open form draft", body, self.cover)
+        self.assertEqual(self.post(self.admin_url("edit", self.a), payload).status_code, 302)
+        self.a.refresh_from_db()
+        self.assertEqual(self.a.live_revision_id, live_revision)
+        self.assertEqual(self.public_data(), public_before)
+        saved = self.a.latest_revision.as_object()
+        self.assertEqual(saved.title, "Legacy open form draft")
+        self.assertEqual(saved.cover_image_id, self.cover.pk)
+        self.assertEqual(BeautifulSoup(str(saved.body), "html.parser").find("embed")["id"], str(self.body_image.pk))
+
 
     def test_sp01_cms_create_upload_choose_server(self):
         add = self.client.get(self.admin_url("add"))
