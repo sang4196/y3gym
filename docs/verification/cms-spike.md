@@ -2,7 +2,7 @@
 
 실행·확인일: **2026-09-18**. 범위: `experiments/cms-spike`의 Post 하나와 CMS 이미지, WSL Ubuntu, 로컬 SQLite·파일 저장소.
 
-**현재 재개 상태(2026-10-04):** §16 참조. 사용자 수동 보고로 이미지 교체·Save draft·Preview·시크릿 공개본 유지 확인. 직접 DB 조회는 최신 초안10(대표6·본문7), 공개 리비전1 유지. 비로그인 HTTP 36건 및 공개 HTML/JSON 바이트 불변 PASS. 자동 브라우저 도구 BLOCKED, 서식/링크 편집·파일 덮어쓰기 비활성 UI 등은 미검증. 사용자 후속 확인을 위해 서버 유지.
+**현재 상태(2026-10-04):** §18에서 검토 중 재현된 이미지 삽입/배치 교체 결함2건을 수정했다. JS8개(실제 설치 라이브러리 상태 전환6 + 모의 연결2), 관련 서버5개 PASS. 새 UI 서버 적용·실제 브라우저 재검증은 대기/BLOCKED다. §17의 초기 구현과 3개 stub 테스트 결과만으로 결함 해소를 판단하지 않는다.
 
 후속 브라우저 검증(2026-09-18): **자동화 도구 BLOCKED / 수동 일부 확인(사용자 보고)**. 아래 §1~9는 이전 서버 검증 기록이며 이번 재실행 결과가 아니다. 도구 진단은 §10~11, 최신 수동 관찰 결과는 §13을 따른다.
 
@@ -402,3 +402,65 @@ SQLite를 `mode=ro`로 직접 조회한 현재 상태:
 다음 한 묶음: A 본문의 시험용 단어에 Bold/Italic 및 `https://example.com/` 링크 적용 → Save draft → 목록에서 다시 열고 Preview에서 서식/링크 유지 확인 → 기존 이미지1 편집 화면에서 파일 교체 입력이 비활성인지 확인만 한다. Publish/Unpublish·자산 삭제·파일 교체·재업로드는 하지 않는다. 이미지 확인을 반복할 필요는 없다. 이후 동일 보호 이미지 URL의 관리자/시크릿 비교와 브라우저 JSON 확인은 별도 미검증 항목이며 자동 HTTP PASS로 대체하지 않는다.
 
 이번 변경 파일은 검증 보고서와 tasks/current.md뿐이다(위 신규 Git 제외 증거 별도). staging/commit/push 없음. 현재 PID401045 서버는 사용자 후속 검사를 위해 **종료하지 않고 127.0.0.1:8765에서 유지**한다. DB·초안·자산·기존 로그 보존. PostgreSQL·상용 Linux 배포·전체 제품 기능·정책 최종 승인은 계속 미검증/미승인, P-01~04·A-01 및 두 ADR은 Proposed다.
+
+
+## 17. 익숙한 글쓰기 UI 시안 — 2026-10-04
+
+### 요청·근거·범위
+
+사용자가 제시한 참고 이미지를 직접 열어 확인했다. 한 줄 상단 툴바와 넓은 본문 영역을 목표로 하되 폰트·색·밑줄·취소선·정렬·표 등 참고 이미지의 모든 버튼을 신규 기능 요구로 해석하지 않았다. 기존 Bold/Italic/H2/번호·글머리 목록/링크/이미지만 사용한다. 이번 승인 범위는 Post 편집 시안이며 CMS·정책 최종 채택이나 전체 제품 구현이 아니다.
+
+[Wagtail 7.4.3 Draftail 확장 문서](https://docs.wagtail.org/en/stable-7.4.x/extending/extending_draftail.html) 및 [rich text widget 계약](https://docs.wagtail.org/en/stable-7.4.x/extending/rich_text_internals.html)을 참고하고 **설치된 7.4.3 소스**에서 실제 계약을 확인했다. `DraftailRichTextArea`의 media/template·ContentstateConverter, `w-draftail:init` 초기화, 옵션의 topToolbar 및 per-instance entityTypes 병합, ImageModalWorkflowSource/ModalWorkflowSource의 선택·완료, DraftUtils.updateBlockEntity, generic panel/preview template와 CSS 선택자를 읽었다. 설정 OPTIONS의 임의 값을 넣으면 적용된다고 가정하지 않았다. 해당 위젯은 features 외 OPTIONS를 버리므로 Post FieldPanel에 위젯 클래스를 지정하고 초기화 이벤트에서 해당 위젯의 옵션만 보완한다. 설치 패키지·전역 feature registry·다른 모델 에디터는 수정하지 않는다.
+
+### 구현한 시안
+
+- **상단 고정 위치의 상시 툴바:** Draftail의 topToolbar 확장점에 한국어 실제 버튼을 모았다. Tab/Shift+Tab·Enter/Space를 위한 일반 button, 눌림 상태 aria-pressed, 서식 그룹 이름을 제공한다. 마우스 선택을 잃지 않도록 mousedown 기본 포커스 이동을 막고 click에서 Draftail 콜백을 호출한다. 키보드 실사용 검증은 별도다.
+- **넓은 입력 영역:** Post 본문 패널의 840px 제한을 해당 클래스 아래에서 해제하고, 본문 최소24rem(작은 창16rem), 내부 스크롤 최대65vh(작은 창60vh)로 구성했다. 툴바는 스크롤 본문 바깥에 남고 작은 창에서는 버튼이 줄바꿈한다. Wagtail 색상 변수를 사용하며 포커스 외곽선을 표시한다. 화면 전체 스크롤에서도 항상 화면 위에 붙는 sticky 헤더는 아니다.
+- **실제 이미지 교체 동작:** 본문 이미지마다 `이미지 선택·교체`와 `본문에서 제거` 버튼을 항상 표시한다. 교체는 보호된 기존 chooser와 형식/alt 단계를 재사용하고 새 자산 또는 기존 자산을 골라 해당 embed의 데이터만 바꾼다. 현재 커서의 블록이 아닌 entityKey에 대응하는 이미지 블록을 찾아 DraftUtils.updateBlockEntity를 호출한다. 취소·삽입은 기본 source 흐름을 유지하고 본문 배치 제거는 기본 onRemoveEntity 콜백이다. 자산 삭제·파일 덮어쓰기 기능이 아니다.
+- **대표 이미지 구분:** 본문 아래 기존 별도 대표 필드를 유지하고 설명을 보존했다. 장문의 상시 도움말은 접을 수 있는 설명으로 줄였다.
+- **새 탭 미리보기:** 본문 위 버튼이 Wagtail의 기존 `newTab` 링크를 클릭해 공식 preview controller의 미저장 폼 POST 및 새 탭 동작을 이용한다. 인증 우회·별도 미리보기 저장소·직접 공개 GET 대체 없음. 기존 사이드 패널도 남겨 두며 자동으로 닫거나 사용자 설정을 바꾸지 않는다. 팝업 차단/실제 새 탭 동작은 미검증이다.
+
+`RichTextField` 정의·DB 마이그레이션·저장 포맷·이미지 ID 표현·Sanitizer·공개 DTO·권한은 그대로다. 새 에디터 라이브러리/패키지·폰트/색/표 기능은 도입하지 않았다. 기존 콘텐츠를 변환하지 않았다. 위젯 지정·정적 파일·도움말을 이전 형태로 되돌리는 것만으로 롤백 가능하며 데이터 역마이그레이션은 필요 없다.
+
+### 실제 검증·수정 과정
+
+초기 실행은 모델 import 중 위젯 인스턴스를 생성해 feature registry가 너무 일찍 로딩되는 오류로 중단됐다. FieldPanel에 **위젯 클래스**를 전달해 폼 생성 시점에 인스턴스화하도록 수정했다. 이어서 Django widget renderer가 프로젝트 templates 디렉터리를 탐색하지 않아 발생한 TemplateDoesNotExist를 앱 내부 `posts/templates/posts/widgets/`로 옮겨 수정했다. 이후 최종 전체 서버 테스트 **17개 PASS (8.182s)**, Django check 문제0건. 기존16개에 위젯 로딩 순서/폼 마크업·서식/목록/링크/이미지ID 왕복 검증1개를 추가했다. 테스트는 기존 임시 메모리 DB와 별도 test-media 경로를 사용했으며 기존 사용자 인증을 이용하지 않았다.
+
+Node 내장 test runner 단위 테스트 **3개 PASS**: Post에만 옵션 적용·실제 버튼 콜백, 기존 preview 동작 위임, 커서 위치와 다른 이미지 entity의 교체 대상 선택. 브라우저/React DOM을 실행하는 시험이 아니라 명시적 stub 기반 연결·분기 테스트다. `node --check` 통과, `makemigrations --check --dry-run`은 No changes detected. CSS 렌더링·IME 입력·실제 이미지 chooser 취소/교체·키보드/스크린리더·작은 창·Preview 새 탭·사용성 만족도는 **NOT_RUN**이다. 공식 Computer Use는 기존 URI 장애로 BLOCKED이며 반복 호출하지 않았다. 시안을 일반 글쓰기 에디터의 사용성 검증 완료로 표현하지 않는다.
+
+증거(Git 제외): `.runtime/composer-tests-20261004-1.log`, `.runtime/composer-js-tests-20261004-1.log`, `.runtime/composer-integrity-20261004-1.json`. 초기 오류는 위 원인/수정 기록이며 실패 실행 원문 로그를 별도 파일로 저장하지는 않았다. private-media 전체 목록/해시는 §16 기준과 동일하다. 다만 SQLite 해시는 다르며 읽기 전용 조회에서 A 공개 리비전1·최신 초안11, B 공개/최신3, 이미지7개·변환본19개·리비전11개를 확인했다. UI 작업 시작 시 DB 해시를 따로 수집하지 않아 변경 시점·원인은 미확정이다. 이번 작업은 실험 DB에 저장/계정/마이그레이션 요청을 실행하지 않았지만 DB 전체 불변을 주장하지 않는다. 사용자 편집일 가능성도 추정으로만 남기며 내용을 원복하지 않는다. 테스트가 만든 별도 test-media는 보존한다.
+
+### 적용 대기·인계
+
+PID401045의 127.0.0.1:8765 서버를 재시작·종료하지 않았다. `--noreload`이므로 현재 모델/위젯 코드는 새 프로세스 시작 전 적용되지 않는다. 사용자 미저장 편집을 먼저 보존했는지 확인하고 별도 조율 후 해당 서버만 재시작해야 한다. 지금 브라우저 새로고침을 요청하거나 실행하지 않았다. 서버 적용 후 최소 검사는 상시 툴바/넓은 입력·키보드와 한글 입력, 두 이미지 중 커서와 다른 이미지 교체 및 취소, 초안 저장/재열기, 새 탭 Preview, 공개본 유지다. CSS/DOM 의존부는 Wagtail 업그레이드 시 재확인해야 한다.
+
+변경은 실험의 models.py/widgets.py/tests.py, composer.js/css, 앱 위젯 템플릿, 본문 도움말, JS 단위 테스트 및 README와 이 보고서/tasks/current.md 기록이다. Git staging/commit/push 없음. PostgreSQL·상용 Linux 배포·전체 제품 기능·정책 최종 승인은 미검증/미승인이며 Proposed 상태를 유지한다.
+
+
+## 18. 검토에서 재현된 이미지 결함 수정 — 2026-10-04
+
+Git 검토 담당자가 초기 UI의 실질 결함2건을 재현해 staging/commit/push를 중단했다. §17의 초기 테스트3개는 실제 entity 변경을 stub으로 대체하여 이를 검출하지 못했다. §17의 `entityKey로 블록 find + updateBlockEntity` 구현 설명은 아래 수정으로 대체한다.
+
+| 초기 FAIL | 원인 | 최소 수정 |
+|---|---|---|
+| 링크 안의 커서에서 이미지 넣기 후 완료·모달 닫기 미호출 | Draftail onRequestSource는 요청 종류와 별개로 커서의 LINK entity도 source props로 전달한다. 기존 코드가 이를 이미지 교체로 판단하고 atomic 블록을 못 찾으면 반환함 | 명시적 이미지 교체 버튼의 요청이 없는 경우 항상 새 IMMUTABLE IMAGE entity를 만들고 실제 AtomicBlockUtils.insertAtomicBlock으로 삽입. LINK entity는 수정하지 않음 |
+| 공유 entityKey의 두 이미지 배치가 함께 바뀜 | updateBlockEntity는 공유 entity 데이터를 merge하며 entityKey만으로는 첫/두 번째 배치를 구분하지 못함 | 버튼의 실제 block.getKey()/blockProps.entityKey 쌍을 위젯별 closure에 전달. source 생성 때 한 번 소비하고 해당 블록 검증 후 새 독립 IMAGE entity를 Modifier.applyEntity로 그 배치에만 연결. 다른 배치의 entity는 그대로 보존 |
+
+설치된 Draftail의 blockRenderer는 React 블록에 `block` 및 `blockProps.entityKey/onEditEntity/onRemoveEntity`를 제공하지만 renderSource props에는 blockKey가 없다. 따라서 selection을 먼저 강제로 바꾸는 방식이나 entityKey 첫 검색 대신 **명시적인 배치 요청을 위젯별로 전달**한다. source 생성 후 요청을 비워 취소 뒤 신규 삽입에 낡은 대상이 남지 않는다. 대상이 현재 atomic IMAGE 배치와 일치하지 않으면 다른 블록을 추정해 수정하지 않고 chooser를 닫아 기존 상태로 완료한다. 기존 모달·형식/alt 선택·보호 chooser URL·취소 lifecycle은 상속한다. 삽입/교체의 상태 전환만 구분하며 권한/저장 converter/Sanitizer/DTO/의존성은 바꾸지 않는다.
+
+교체는 새 entity 데이터로 선택 결과의 ID/src/alt/format을 적용하고, 원래 selectionBefore/After와 EditorState selection을 유지해 다른 본문·선택·undo를 보호한다. 실제 DOM 포커스가 동일하게 돌아오는지는 브라우저 확인이 필요하다.
+
+### 회귀 증거
+
+`node --test tests/composer.test.cjs tests/composer-library.test.cjs`: **8개 PASS**.
+
+- 모의 연결 검사2개: Post 전용 초기화/툴바·이미지 콜백 연결, 기존 새 탭 Preview 호출.
+- 실제 설치 라이브러리 상태 전환6개: LINK 커서에서 IMAGE 삽입·완료/close, 공유 entity 첫 번째 배치만 교체, 두 번째 배치만 교체, 삽입/첫 배치/두 번째 배치 chooser 취소 불변 및 이후 삽입 독립성. 다른 이미지 ID/alt/format, 본문, 링크, 선택, 원래 상태 및 undo를 검증한다.
+
+새 테스트 로더는 설치된 vendor.js/draftail.js를 **Node VM 메모리 안에서만** 읽어 실제 Draft.js 모듈과 Wagtail의 source/filter/cancel 및 onRequestSource/getSelectionEntity 메서드를 사용한다. 설치 파일·브라우저 프로토콜을 변경하거나 도구 장애를 우회하지 않는다. webpack bootstrap/메서드 추출 문자열은 설치 버전 의존 테스트 어댑터이며 바뀌면 실패하여 검토를 요구한다. 실제 DOM/ModalWorkflow UI는 띄우지 않고 chooser 결과·close 콜백 경계를 주입하므로 브라우저 통합 테스트는 아니다.
+
+관련 서버5개 **PASS (2.807s)**: 위젯/저장 왕복, SP-01 관리자/chooser, SP-03 공개본 보존, SP-05 인증 Preview, SP-06 보호 파일. 기존 메모리 테스트 DB/별도 test-media 사용. 초기17개 전체 PASS는 §17 기록이며 이번에 전체 재실행한 것은 아니다. JS syntax 및 git diff --check 통과.
+
+증거는 `experiments/cms-spike/.runtime/composer-fix-20261004T100822523110Z/`의 test-1.log(JS), test-2.log(서버), before.json/after.json/results.json에 신규 보존했다. 테스트 전후 private-media 목록/해시는 동일하지만 **실험 SQLite 파일 해시는 달라 전체 불변 검사는 통과하지 못했다**. 후속 읽기 전용 Post 조회는 A 공개1/최신11, B 공개3/최신3으로 이전과 같다. 원인은 미확정이며 사용자 서버가 계속 실행 중인 조건이다. 계정·세션·비밀값은 조사하지 않았고 실험 DB 저장·마이그레이션·원복 요청은 실행하지 않았다. 데이터 무결성 전체 PASS로 확대하지 않는다.
+
+이번 후속 수정 파일: composer.js, 기존 composer.test.cjs, 신규 composer-library.test.cjs, README 및 검증보고서/tasks/current.md 기록. 기존 미커밋 시안 전체는 보존. 서버 PID401045의 127.0.0.1:8765 리스너를 확인했으며 서버·브라우저 재시작/종료/새로고침 없음, Git 쓰기 없음. 재검토 후 사용자 편집 보존·서버 적용을 별도로 조율한다. 실제 브라우저의 링크 커서 삽입·공유 이미지 배치별 교체·취소·포커스·한글 입력·미리보기는 여전히 NOT_RUN, 공식 도구는 BLOCKED다.

@@ -1,3 +1,4 @@
+import json
 import platform
 import sys
 import tempfile
@@ -97,6 +98,30 @@ class CmsSpikeTests(TestCase):
             self.assertFalse(response.get("Content-Type", "").startswith("image/"))
         response.close()
         return response
+
+    def test_post_composer_widget_and_richtext_round_trip(self):
+        from .widgets import PostRichTextArea
+        response = self.client.get(self.admin_url("edit", self.a))
+        soup = BeautifulSoup(response.content, "html.parser")
+        field = soup.select_one('[name="body"][data-spike-post-editor]')
+        self.assertIsNotNone(field)
+        options = json.loads(field["data-w-init-detail-value"])
+        self.assertEqual({item["type"] for item in options["entityTypes"]}, {"LINK", "IMAGE"})
+        self.assertEqual({item["type"] for item in options["inlineStyles"]}, {"BOLD", "ITALIC"})
+        scripts = [script.get("src", "") for script in soup.find_all("script")]
+        custom = next(i for i, src in enumerate(scripts) if "posts/composer.js" in src)
+        native = next(i for i, src in enumerate(scripts) if "wagtailadmin/js/draftail.js" in src)
+        self.assertGreater(custom, native)
+        self.assertIsNotNone(soup.select_one('[data-spike-preview][type="button"]'))
+        self.assertIsNotNone(soup.select_one('.w-preview [data-w-preview-target="newTab"]'))
+        widget = PostRichTextArea(features=Post._meta.get_field("body").features)
+        body = self.old_body + '<ul><li>Bullet</li></ul><ol><li>Number</li></ol>'
+        restored = widget.value_from_datadict({"body": widget.format_value(body)}, {}, "body")
+        restored_soup = BeautifulSoup(restored, "html.parser")
+        self.assertEqual(restored_soup.find("embed")["id"], str(self.body_image.pk))
+        for tag in ("h2", "b", "i", "ul", "ol"):
+            self.assertIsNotNone(restored_soup.find(tag))
+        self.assertEqual(restored_soup.find("a")["href"], "https://example.com/")
 
     def test_sp01_cms_create_upload_choose_server(self):
         add = self.client.get(self.admin_url("add"))

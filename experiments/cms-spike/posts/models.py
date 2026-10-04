@@ -5,6 +5,7 @@ from wagtail.fields import RichTextField
 from wagtail.models import DraftStateMixin, PreviewableMixin, RevisionMixin
 from wagtail.snippets.models import register_snippet
 from .forms import PostForm
+from .widgets import PostRichTextArea
 
 
 @register_snippet
@@ -24,8 +25,10 @@ class Post(DraftStateMixin, RevisionMixin, PreviewableMixin, models.Model):
         ),
         FieldPanel(
             "body",
-            heading="본문 · 글과 본문 이미지",
-            help_text="글은 텍스트 부분에서 편집하고, 이미지 작업은 이미지 자체를 클릭해 시작합니다.",
+            widget=PostRichTextArea,
+            classname="spike-post-body",
+            heading="본문",
+            help_text="상단 도구로 서식을 적용하고 이미지를 넣습니다. 기존 이미지는 아래 선택·교체 버튼으로 바꿉니다.",
         ),
         FieldPanel(
             "cover_image",
