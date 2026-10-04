@@ -1,0 +1,14 @@
+:root { color-scheme: light; font-family: system-ui,sans-serif; color: #182b25; background: #fafbf8; }
+body { margin: 0 auto; max-width: 72rem; padding: 1.25rem; line-height: 1.65; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; border-bottom: 1px solid #becbc4; padding-block: 1rem; }
+nav { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+a { color: #175b47; text-underline-offset: .2em; }
+a:focus-visible { outline: 3px solid #196ac6; outline-offset: 4px; }
+main { min-height: 65vh; padding-block: 2rem; }
+article { padding-block: 2rem; border-bottom: 1px solid #becbc4; scroll-margin-top: 1rem; }
+img { max-width: 100%; height: auto; border-radius: .4rem; }
+.logo { max-width: 10rem; }
+.text { white-space: pre-line; }
+.photos { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap: 1rem; }
+figure { margin: 0; }
+footer { padding-block: 2rem; }

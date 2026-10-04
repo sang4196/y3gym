@@ -9,6 +9,12 @@
 
 > 이 문서는 향후 분리될 고객용 프론트가 사용할 데이터 계약의 초안이다. API가 이미 구현되었다거나 현재 HTTP 엔드포인트를 반드시 모두 개발해야 한다는 뜻이 아니다. 경로·필드·응답 방식은 제안이며, 실제 구현은 Architecture ADR과 별도 작업 승인 후 진행한다.
 
+## DEV-01 적용 기록 — 2026-10-05
+
+사용자 승인으로 `/api/v1/site/`, `/api/v1/branches/`와 초기 홈/지점 HTML만 구현했다. 아래 SiteContentDTO/BranchDTO·문자열ID/null/[]/meta.server_time·고정 오류 구조를 적용한다. 사이트 미준비503 CONTENT_NOT_READY, 미지원 질의400 INVALID_QUERY, 쓰기405 METHOD_NOT_ALLOWED, 미존재404 NOT_FOUND다. 관리자 세션도 공개 범위를 넓히지 않는다. local origin은 `http://127.0.0.1:8766`; 운영 HTTP 허용 승인이 아니다.
+
+location=null, trainer_section_path=null이며 나머지 엔드포인트/지도·트레이너/제품Post·Popup은 미구현이다. 초기 HTML과 JSON은 같은 materialized 공개 projection을 사용하며 PG shared lock을 다중 쿼리·변환 전체에 유지한다. 실제 부분 검증은 [DEV-01 보고서](verification/dev-01.md)를 따른다. 이 기록은 아래 전체 API 계획의 일괄 PASS/승인이 아니다.
+
 ## 1. API의 경계
 
 고객에게 이미 공개하기로 한 콘텐츠의 **조회 전용** API다. 회원가입, 고객 로그인, 예약·결제, PT 관리, 트레이너 업무 계정, 관리자용 공개 CRUD API는 추가하지 않는다.

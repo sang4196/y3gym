@@ -1,9 +1,9 @@
 # y3gym
 The y3gym website made solely with Codex
 
-현재 단계: **설계 문서 v0.2 초안 검토 및 승인된 격리 시험 SPIKE-01**. 제품용 홈페이지는 아직 구현하지 않았다. Post·CMS 이미지의 시험 코드와 실행 결과는 [실험 안내](experiments/cms-spike/README.md) 및 [검증 보고서](docs/verification/cms-spike.md)에서 구분한다.
+현재 단계: **DEV-01 한정 제품 구현·검증**. 사이트 소개·지점·시설 사진·이용안내 관리와 첫 공개 홈/지점 조회를 구현했다. 실행은 [제품 앱 안내](app/README.md), 실제 결과·미검증은 [DEV-01 검증 보고서](docs/verification/dev-01.md)를 따른다. 이전 Post·CMS 이미지 SPIKE는 [실험 안내](experiments/cms-spike/README.md)와 [보고서](docs/verification/cms-spike.md)에 별도 보존한다. 전체 홈페이지·상용 배포 완료를 뜻하지 않는다.
 
-현재 환경은 **Windows 호스트 위 WSL Ubuntu 개발 / 별도 Linux 상용 서버 운영 예정**이다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python과 셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS, WSL2 커널, Python 3.14.4, ext4의 현재 저장소다. 운영 배포판·버전·호스팅·실행 방식은 미정이다. Django + Wagtail + PostgreSQL과 초기 서버 템플릿은 계속 **Proposed**이며 격리 실험 설치는 기술 채택이 아니다. `review-resolution.md`의 Windows 중심 설명은 이전 기록으로 보존한다.
+현재 환경은 **Windows 호스트 위 WSL Ubuntu 개발 / 별도 Linux 상용 서버 운영 예정**이다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python과 셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS, WSL2 커널, Python 3.14.4, ext4의 현재 저장소다. 운영 배포판·버전·호스팅·실행 방식은 미정이다. Django + Wagtail + PostgreSQL과 초기 서버 템플릿/공통 공개 조회는 2026-10-05 승인으로 **DEV-01에 한정 채택**했다. Site/Branch 저장·본점·삭제/미디어 정책의 한정 채택은 두 ADR의 추가 기록을 따른다. 나머지 정책·운영 구성은 계속 Proposed/TBD다. `review-resolution.md`의 Windows 중심 설명은 이전 기록으로 보존한다.
 
 ## 문서
 
@@ -13,10 +13,10 @@ The y3gym website made solely with Codex
 | [docs/data-model.md](docs/data-model.md) | v0.2 초안: 관계·저장 단위·공개·삭제·미디어 정책 제안 |
 | [docs/api-contract.md](docs/api-contract.md) | v0.2 초안: 공개 조회 계약, API-01~24 검증 계획 |
 | [docs/review-resolution.md](docs/review-resolution.md) | 기존 v0.1 검토 근거: C 보정 / P-01~04·A-01 Proposed, 이번 작업에서 변경하지 않음 |
-| [ADR-0001](docs/adr/0001-runtime-and-deployment.md) | v0.2 Proposed: 실행·배포·버전 선정과 ENV-01~06 |
-| [ADR-0002](docs/adr/0002-publication-and-media.md) | v0.2 Proposed: P-01~04 대안·대가와 RV-01~15 |
+| [ADR-0001](docs/adr/0001-runtime-and-deployment.md) | v0.2 Proposed + DEV-01 한정 채택: 실행·배포·버전·ENV-01~06 |
+| [ADR-0002](docs/adr/0002-publication-and-media.md) | v0.2 Proposed + DEV-01 한정 채택: P-01~04·RV-01~15 |
 | [AGENTS.md](AGENTS.md) | 현재 설계 단계의 작업 범위·승인 구분·환경 주의 |
 
-문서 저장은 정책 승인이 아니다. C 항목은 기존 의미 보정이며 P-01~04·A-01과 기존 화면·팝업·공개일·API 경로·페이지 크기 제안은 승인 대기다. 가격·PT 연계·고객 로그인·지점별 게시판·별도 관리자 프론트·자유 페이지 빌더는 범위에 추가하지 않는다.
+문서 저장 자체는 정책 승인이 아니다. DEV-01은 사용자의 별도 실행 승인에 근거하며, 미포함 모델의 P 정책·팝업·공개일·나머지 API/화면 제안은 승인 대기다. 가격·PT 연계·고객 로그인·지점별 게시판·별도 관리자 프론트·자유 페이지 빌더는 범위에 추가하지 않는다.
 
 변경 요약 (2026-09-18): 기존 소개를 유지하고 현재 단계·실제 문서 경로·Windows/Linux 방향을 추가했다. 다음 작업은 정책 결정과 별도 승인된 기술 검증이며 이번 문서 작업에서 자동으로 구현을 시작하지 않는다.

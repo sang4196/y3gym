@@ -1,0 +1,12 @@
+{% extends 'content/base.html' %}{% block content %}
+{% if site %}
+{% if site.logo %}<img class="logo" src="{{ site.logo.url }}" alt="{{ site.logo.alt }}" width="{{ site.logo.width }}" height="{{ site.logo.height }}">{% endif %}
+<h1>{{ site.hero_title|default:site.brand_name }}</h1>
+{% if site.hero_description %}<p class="text">{{ site.hero_description }}</p>{% endif %}
+{% if site.hero_image %}<img src="{{ site.hero_image.url }}" alt="{{ site.hero_image.alt }}" width="{{ site.hero_image.width }}" height="{{ site.hero_image.height }}">{% endif %}
+{% if branches %}<p><a href="/branches/">지점별 문의</a></p>{% endif %}
+{% if site.introduction %}<section><h2>소개</h2><p class="text">{{ site.introduction }}</p></section>{% endif %}
+{% if site.introduction_image %}<img src="{{ site.introduction_image.url }}" alt="{{ site.introduction_image.alt }}" width="{{ site.introduction_image.width }}" height="{{ site.introduction_image.height }}">{% endif %}
+{% if branches %}<section><h2>지점 안내</h2>{% for branch in branches %}<article><h3><a href="/branches/#branch-{{ branch.id }}">{{ branch.name }}</a>{% if branch.is_main %} · 본점{% endif %}</h3>{% if branch.summary %}<p>{{ branch.summary }}</p>{% endif %}{% if branch.cover_image %}<img src="{{ branch.cover_image.url }}" alt="{{ branch.cover_image.alt }}" width="{{ branch.cover_image.width }}" height="{{ branch.cover_image.height }}">{% endif %}<p>{{ branch.address }}</p></article>{% endfor %}</section>{% endif %}
+{% else %}<h1>사이트 소개를 준비 중입니다.</h1>{% endif %}
+{% endblock %}

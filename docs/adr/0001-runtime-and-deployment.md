@@ -5,6 +5,12 @@
 근거: [검토 보완안 A-01](../review-resolution.md), [화면 명세](../screens.md), [데이터 모델](../data-model.md), [API 계약](../api-contract.md)  
 변경 요약: A-01을 환경 분리·버전 선정·ENV 검증·배포/복구 경계로 구체화한 최초 ADR 초안이다. 제품 정책 승인·설치·실행 결과가 아니다.
 
+## DEV-01 한정 채택 기록 — 2026-10-05
+
+사용자의 “ㅇㅇ 진행해” 승인으로 DEV-01에 Django/Wagtail/PostgreSQL·초기 서버 템플릿/공통 공개 조회를 채택했다. 전체 ADR 상태와 아래 이전 Proposed 이력은 유지하며 운영 배포·호스팅·나머지 모델/정책을 일괄 승인하지 않는다. 제품 app/를 SPIKE와 분리한다. 로컬 PostgreSQL은 Ubuntu 공식 패키지18.6을 해시 검증하여 프로젝트 경로에 추출하고 사용자 소유 클러스터/0700 소켓/peer 인증으로 실행한다. 시스템 sudo 권한이 없어 시스템 패키지 설치·서비스 변경은 하지 않았다. dev role은 DB생성 권한 없음, 별도 test role만 테스트DB 생성 가능. TCP DB 리스너는 없다.
+
+Django5.2.17·Wagtail7.4.3 LTS·Pillow12.3.0·psycopg[binary]3.3.6을 Python3.14.4의 별도 Linux venv에 설치·해시 잠금했다. 공식 지원 교집합 재확인과 실제 PG18.6/libpq18.6 실행 근거는 [DEV-01 보고서](../verification/dev-01.md)와 [앱 안내](../../app/README.md)에 기록한다. 특정 상용 Linux/운영 서버/HTTPS/복구 완료로 확대하지 않는다. 아래 ENV 전체 ‘미실행’ 표는 최초 계획이며 DEV-01의 Site/Branch 부분 실측 결과만 별도 보고서에서 갱신한다.
+
 ## 1. 배경
 
 현재 조건(2026-09-18 SPIKE-01 갱신)은 Windows 호스트 위 WSL Ubuntu 개발, 향후 별도 Linux 상용 서버 배포, 이후 고객 프론트 분리다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python·셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS / WSL2 커널 / Python 3.14.4 / ext4 저장소다. Windows 제품·버전, WSL 패키지 버전, 운영 Linux 배포판·버전·호스팅·실행 방식은 TBD다. `review-resolution.md`의 Windows 중심 설명은 원문 기록으로 보존한다.

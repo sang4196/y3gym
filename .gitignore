@@ -9,3 +9,12 @@
 /experiments/cms-spike/**/__pycache__/
 /experiments/cms-spike/**/*.pyc
 /experiments/cms-spike/**/*.log
+
+# DEV-01 isolated application environment and generated data
+/app/.venv/
+/app/.runtime/
+/app/.cache/
+/app/.env
+/app/.env.*
+/app/**/__pycache__/
+/app/**/*.pyc
