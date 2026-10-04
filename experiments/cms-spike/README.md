@@ -2,6 +2,8 @@
 
 제품용 홈페이지가 아닌 Django/Wagtail 후보 시험이다. P-01의 Post 정책과 P-03·P-04는 실험 가설이며 P-01~04/A-01 및 두 ADR은 계속 Proposed다. 실제 결과·미검증 범위는 [검증 보고서](../../docs/verification/cms-spike.md)에 있다.
 
+**2026-10-04 재개:** 기존 venv·DB·`local-editor`를 그대로 사용한다. 계정 생성·seed·설치·마이그레이션을 반복하지 않는다. A 최신 초안8에는 TEST 표식과 파랑 대표6·보라/빨강 본문4·7이 이미 저장돼 있다. 공개 리비전1은 그대로다. 서버는 이번 재개에서 127.0.0.1:8765, PID 401045로 시작해 유지했다(다음 세션에서는 PID/포트를 다시 확인). 바로 기존 계정으로 A를 열어 “본문 이미지 바꾸기” 안내와 저장된 이미지 표시를 확인한다. 과거 Save draft/재시작 대기 안내는 현재 다음 단계가 아니다. 상세 증거·종료 방법은 보고서 §15에 있다.
+
 2026-09-18 WSL Ubuntu 26.04.1 / Linux Python 3.14.4에서 실행했다. Django 5.2.17, Wagtail 7.4.3, Pillow 12.3.0을 격리 설치했다. SQLite는 CMS 동작 시험용이며 PostgreSQL·운영 배포 검증이 아니다. Windows 네이티브 Python이나 PowerShell용 가상환경을 사용하지 않는다.
 
 ## WSL 실행
@@ -31,7 +33,7 @@ uv --no-config --cache-dir .cache pip check --python .venv/bin/python
 
 테스트는 임시 메모리 SQLite DB와 `.runtime/test-media-*`를 사용한다. 현재 `.runtime/spike.sqlite3`와 데모 자료를 초기화하지 않는다. 테스트 미디어는 이번 작업에서 자동 삭제하지 않았으므로 재실행 때 용량이 늘어난다. 로그를 저장하려면 기존 로그를 덮어쓰지 않는 새 파일명을 사용한다.
 
-## 관리자 확인 절차 — 실제 브라우저 검증은 NOT_RUN
+## 관리자 확인 절차 — 자동화 BLOCKED / 수동 일부 확인
 
 최초 시험에서는 실제 클릭·서식 입력·선택창·미리보기 표시를 확인하지 못했다. 2026-09-18 후속 작업에서는 Computer Use 도구가 제공됐으나 공식 `node_repl` 초기화가 `sandboxCwd is not a local file URI: file:///home/shlee/Workspace/ai/01.codex/y3gym`로 실패하여 **BLOCKED**다. 서버 테스트는 브라우저 사용성을 대체하지 않는다. 상세 증거는 검증 보고서 §10에 있다.
 
@@ -43,13 +45,13 @@ uv --no-config --cache-dir .cache pip check --python .venv/bin/python
    .venv/bin/python manage.py seed_demo
    ```
 
-2. 일반 운영자 계정은 아래 명령으로 직접 만든다. 암호는 숨김 입력이며 명령줄·문서·로그에 넣지 않는다. 기존 계정이면 변경 없이 중단한다. 이 대화에서는 로그인 가능한 계정을 생성하지 않았다. 명령의 대화형 입력은 미실행이다.
+2. 최초 시험 당시 계정 생성은 미실행이었으나 이후 사용자 로그인 성공 보고가 있었고, 2026-10-04 `local-editor`의 활성 일반 운영자 상태를 직접 확인했다. **현재 재개에서는 아래 명령을 실행하지 않고 기존 계정으로 직접 로그인한다.** 아래는 계정이 없는 최초 준비용이며 암호는 숨김 입력, 기존 계정이면 변경 없이 중단한다.
 
    ```bash
    .venv/bin/python manage.py create_spike_editor local-editor
    ```
 
-3. WSL에서 루프백 서버를 시작하고 브라우저에서 `http://127.0.0.1:8765/admin/`에 접속한다. Windows 브라우저에서 WSL 루프백으로 접근 가능한지는 이 작업에서 확인하지 않았다. 접근 실패 시 바인딩·방화벽을 확대하지 않는다.
+3. 먼저 현재 루프백 서버 유무를 확인한다. 서버가 없을 때만 아래 명령으로 시작한다. 9/18 사용자에게 Codex 내장 브라우저 로그인·시크릿 공개 페이지 표시 보고를 받았다. 10/04 새 서버의 루프백 HTTP 접근은 확인했지만 Windows 브라우저 재접속은 아직 미확인이다. URL은 `http://127.0.0.1:8765/admin/`. 접근 실패 시 바인딩·방화벽을 확대하지 않는다.
 
    ```bash
    .venv/bin/python manage.py runserver 127.0.0.1:8765 --noreload --insecure
@@ -92,7 +94,7 @@ uv --no-config --cache-dir .cache pip check --python .venv/bin/python
 
 ### 1. WSL에서 준비하고 사용자 직접 로그인
 
-기존 WSL Ubuntu 터미널에서 실행한다. 새 증거 폴더를 만들고 Windows에서 접근할 경로를 출력한다. 아래 명령은 아직 실행하지 않은 사용자용 절차다.
+아래는 최초 수동 준비용 명령이다. 2026-10-04 재개에서는 계정과 서버가 준비되어 있으므로 **계정 생성과 서버 시작은 건너뛴다**. 새 수동 증거 폴더가 필요할 때만 해당 줄을 실행한다.
 
 ```bash
 cd /home/shlee/Workspace/ai/01.codex/y3gym/experiments/cms-spike
