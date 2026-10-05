@@ -8,13 +8,26 @@
 
 게시글 메타는 실제 공개 리비전만 사용하고 인증 Preview/오류/준비중에는 noindex를 붙인다. 홈 설명이 없으면 임의 홍보 문구를 만들지 않는다. HTML의 본문 사진만 lazy 속성을 추가하며 공개 JSON 형식은 그대로다. 새 폰트/CDN/JS/패키지·관리자 편집 변경·모델 migration/권한 적용은 없다.
 
-실제 PG **76개/45.399s PASS**(기존68+신규8), 팝업 Node **16개/372.024702ms PASS**, 공개 JSON5종/콘텐츠·미디어 전후 동일. 제품은 **PID515502/127.0.0.1:8766**으로 적용했으며 PG456028·SPIKE452717은 유지했다. 아래 이전 PID·검토 대기는 이력이다. 실제320px/200% 확대·키보드·모바일은 NOT_RUN, [DEV-06 보고서](../docs/verification/dev-06.md)에 계층별 증거와 한 묶음 후속 확인을 기록했다. 개발 쓰기 중지 후 Git 검토 대기다.
+실제 PG **76개/45.399s PASS**(기존68+신규8), 팝업 Node **16개/372.024702ms PASS**, 공개 JSON5종/콘텐츠·미디어 전후 동일. 제품은 **PID515502/127.0.0.1:8766**으로 적용했으며 PG456028·SPIKE452717은 유지했다. 아래 이전 PID·검토 대기는 이력이다. 실제320px/200% 확대·키보드·모바일은 NOT_RUN, [DEV-06 보고서](../docs/verification/dev-06.md)에 계층별 증거와 한 묶음 후속 확인을 기록했다. Git 검토·정상 push는 `285833fe`로 완료했다.
+
+## DEV-07-A 격리 복원·운영 후보 준비
+
+[DEV-07-A 결과](../docs/verification/dev-07.md)와 [Linux 배포 후보](../docs/deployment/linux-candidate.md)를 따른다. 운영 대상/도메인·비용·키·복구정책은 TBD이며 실제 운영 배포·DEV-07 전체 완료가 아니다. 현재 local/test와 제품515502/8766·PG456028·SPIKE452717은 변경/재시작하지 않았다.
+
+```bash
+# app cwd. 기존 DB/경로/백업을 인수로 받지 않는 합성 연습 전용:
+.venv/bin/python scripts/restore_drill.py
+```
+
+매 실행 새로운 test-role DB2개·합성자료/미디어만 만들고 pg_dump/pg_restore·체크섬/manifest·공개/초안/리비전·이미지권한과 운영후보를 검사한다. 생성 DB는 owner/OID 확인 후 정리하고 `.runtime/restore-drill-{id}/`의 합성 backup·media·로그는 보존한다. 개발/SPIKE·운영 DB 복원에 사용하지 않는다. production 설정은 소스트리 밖0700 임시저장소·시험키·가짜도메인과 복원된 합성DB로만 검증한다. 해당 임시자산도 결과경로에 남고 실제 비밀값을 읽지 않는다.
+
+최종11안전거부·5복원시나리오·16설정거부·14실제 Gunicorn HTTP 항목 PASS, 추가진입거부4건 PASS. 실제HTTPS/프록시 성공을 뜻하지 않는다. HSTS는 TLS검증 전0으로 두어 `check --deploy` security.W004 경고1개를 기록했다. 시험 Gunicorn master/worker는 종료했고 제어소켓은 꺼져 있다. 기존 PG76/팝업Node16은 DEV-06 실행이력이며 이번 전체재실행하지 않았다. 실제 브라우저/지도·실콘텐츠·운영환경은 대기한다.
 
 ## 환경과 분리
 
-- WSL Ubuntu 26.04.1, Linux Python3.14.4. 별도 `.venv`, PostgreSQL18.6, Django5.2.17, Wagtail7.4.3 LTS, Pillow12.3.0, psycopg[binary]3.3.6, bleach6.4.0. `requirements.lock`은 전이 의존성37개와 해시를 고정한다.
+- WSL Ubuntu 26.04.1, Linux Python3.14.4. 별도 `.venv`, PostgreSQL18.6, Django5.2.17, Wagtail7.4.3 LTS, Pillow12.3.0, psycopg[binary]3.3.6, bleach6.4.0. `requirements.lock`은 Gunicorn26.2.0을 포함한38개 패키지와 해시를 고정한다. 기존37개 버전은 변경하지 않았다.
 - `.runtime/`는 Git 제외·소유자 전용이며 PG 데이터/패키지/로그·개발 미디어·개발 Django 키·테스트 증거를 보존한다. 내용 출력·환경변수 덤프·초기화/삭제를 하지 않는다. OS 간 venv 복사 없음.
-- `config/settings/base.py` 공통 설정, `local.py` 개발 연결/키/미디어, `test.py` 별도 PG 테스트 role/DB/매 실행 별도 미디어. 운영 설정은 아직 제공하지 않는다. local의 HTTP·쿠키 설정을 운영에 사용하지 않는다.
+- `config/settings/base.py` 공통 설정, `local.py` 개발 연결/키/미디어, `test.py` 별도 PG 테스트 role/DB/매 실행 별도 미디어. `production.py`/WSGI·Gunicorn은 DEV-07-A에서 별도 로컬검증 후보로 준비했으며 실제 운영 적용은 미실행이다. local의 HTTP·쿠키 설정을 운영에 사용하지 않는다.
 - 기존 `experiments/cms-spike`와 DB·계정·미디어·venv·서버가 독립이다. SPIKE8765를 재사용/종료하지 않는다. 제품은127.0.0.1:8766, cookie 이름도 별도다.
 
 ## 최초 준비 (이미 준비된 환경에서는 반복하지 않음)

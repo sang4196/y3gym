@@ -29,6 +29,12 @@ Django5.2.17·Wagtail7.4.3 LTS·Pillow12.3.0·psycopg[binary]3.3.6을 Python3.14
 
 [DEV-06 보고서](../verification/dev-06.md)에 셸/HTML·보존·미검증을 구분한다. 실제 모바일/확대/키보드·접근성은 NOT_RUN이며 지도Q-02/계정·키/좌표 정책 및 운영 배포는 대기다. 전체 ADR/P 제안을 일괄 Accepted로 바꾸지 않는다.
 
+## DEV-07-A 로컬 준비 한정 기록 — 2026-10-05
+
+순차 승인 범위에서 WSGI/Gunicorn26.2.0을 **운영 후보의 로컬검증**에 한정 적용했다. product venv에 Gunicorn1개만 해시 고정 추가하고 기존37개 버전·local/test 설정은 유지한다. production 설정은 필수 호스트/HTTPS origin/키/PG·별도 비공개media/static/tmp를 명시하고 위험한 값은 시작거부한다. Django의 임의 forwarded 신뢰는 끄며 Gunicorn의 명시 peer만 허용, 제어소켓은 비활성이다. 실제TLS 전 HSTS0·includeSubDomains/preload false이고 check --deploy의 W004 경고1개를 그대로 기록한다.
+
+실제 개발/SPIKE를 백업하지 않고 새 test role 전용 고유DB 두 개·합성미디어에 PG18.6 dump/restore와 manifest/참조·리비전·공개/초안/미디어 권한을 검증했다. 원본쓰기 중지·정확한 대상/owner/OID·빈대상·경로/symlink·체크섬·0600/0700·실패거부가 연습의 경계다. 연습 생성DB/시험프로세스만 정리하고 증거를 보존했다. 운영백업 암호화/보존/책임/외부보관/RPO·RTO·대상Linux/HTTPS·배포는 TBD/NOT_RUN이며 전체 ADR을 Accepted로 승격하지 않는다. [DEV-07-A 보고서](../verification/dev-07.md)와 [미적용 배포 후보](../deployment/linux-candidate.md)를 따른다.
+
 ## 1. 배경
 
 현재 조건(2026-09-18 SPIKE-01 갱신)은 Windows 호스트 위 WSL Ubuntu 개발, 향후 별도 Linux 상용 서버 배포, 이후 고객 프론트 분리다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python·셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS / WSL2 커널 / Python 3.14.4 / ext4 저장소다. Windows 제품·버전, WSL 패키지 버전, 운영 Linux 배포판·버전·호스팅·실행 방식은 TBD다. `review-resolution.md`의 Windows 중심 설명은 원문 기록으로 보존한다.

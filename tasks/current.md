@@ -1,5 +1,22 @@
 # 현재 작업 — 제품 순차 개발
 
+## DEV-07-A 결과 — 로컬 준비·검증 완료, 쓰기 중지/검토 인계
+
+- [DEV-07-A 추적/결과](../docs/verification/dev-07.md)에 UX/API/RV/ENV의 과거PASS·사용자보고·새실측·NOT_RUN/BLOCKED를 구분했다. 기존 PG76·Node16은 반복하지 않았다. 지도Q-02 기존질문 답변대기·location=null, 사용자에게 새질문 없음.
+- 새 고유 test-role PG DB2개·합성자료만 실제PG18.6 custom dump/restore. 최종 전후snapshot/콘텐츠·리비전/미디어8개 동일, 안전거부11·복원후 공개/초안/공유/마지막참조/과거새초안5묶음 PASS. dump0.119700s/restore0.367174s/전체39.138756s는 작은연습 측정이며 운영RPO/RTO 아님.
+- 별도 production 설정/WSGI/Gunicorn26.2.0 후보·버전/해시 추가(기존37버전 유지), 설정시작거부16/실제Gunicorn HTTP14·진입거부4 PASS. collectstatic89파일, securecookies/Host/CSRF/debug오류/신뢰peer 경계검사. HSTS0에 따른 check --deploy W004 경고1개 유지. 실제TLS·프록시/상용Linux는 NOT_RUN.
+- Gunicorn forwarder_headers 타입오류·test role의 server설정조회 권한부족은 최소수정 후 새연습으로 재검증, 실패로그보존. 26.x 기본 control socket은 명시꺼짐으로 보강·최종생성없음 확인. 역할권한을 늘리지 않았다.
+- 최종 증거 `app/.runtime/restore-drill-586076022263344727c98e28/`, 집계/실패/보존 `app/.runtime/dev-07-20261005T031750484503Z/`. 생성한DB만 owner/OID 확인후정리, 모든시도8개가능DB명 부재확인. 최종시험Gunicorn518739/518745와worker 종료. 합성 backup/media/log 보존, 임시prod자산경로는 보고서에 기록.
+- 제품515502/127.0.0.1:8766·PG456028·SPIKE452717/8765 동일프로세스 유지. 개발콘텐츠/미디어7·SPIKE A1/19/B3/3/미디어31 해시는 작업중전후 및 DEV-06종료근거와 동일. 실계정/암호/세션/비밀파일·dev migration/seed/복제/백업 없음.
+- [미적용 Linux 배포 후보](../docs/deployment/linux-candidate.md)에 대상/도메인/비용/키·정합복구·암호화/보존/책임·실제검증 TBD를 남겼다. 실제브라우저·지도·운영 및 DEV-07 전체완료로 표시하지 않는다. 최종diff점검 후 개발쓰기중지·설계자Git검토인계. stage/commit/push·DEV-08/운영배포 없음. 아래 배정/완료는 실행이력이다.
+
+## 현재 배정: DEV-07-A 통합 검증·격리 복원·운영 후보 준비
+
+- 2026-10-05 설계자 배정. HEAD `285833feef65bca4ffa4fc52b2fbd9e8838df720`/clean 직접 확인. DEV-06 Git 검토·정상 push 완료 통보를 받았고 기존 PG76/Node16은 실행 이력이다.
+- 완료 조건: UX/API/RV/ENV 근거·미검증 추적, 이번 실행 전용 test role/고유DB 두 개와 합성 미디어의 실제 pg_dump/pg_restore·안전 거부/복원 검증, fail-closed production 설정/WSGI·Gunicorn 로컬 후보·check/스모크, 운영대상 TBD인 배포/복구 절차, 자료 보존 후 쓰기 중지·Git 인계.
+- dev DB/계정/세션/암호/권한/미디어·제품515502/8766·PG456028·SPIKE452717/8765 보존. 개발/SPIKE 백업/복제/복원·migration/seed·제품 재시작은 하지 않는다. 시스템/WSL/방화벽/외부자원 변경·Git 쓰기·DEV-08/운영 배포 금지.
+- 지도Q-02 기존 질문 답변 대기, 새 질문/무응답 승인/외부지도·키 조회 없음. 실제 브라우저/모바일/키보드/운영HTTPS/상용Linux는 별도 NOT_RUN. DEV-07 전체 완료로 확대하지 않는다.
+
 ## DEV-06 결과 — 구현·로컬 적용 완료, 쓰기 중지/검토 인계
 
 - 고정 순서 홈·공통 브랜드/선택 로고/메뉴·본문 바로가기·지점 수별 문의, 지점/트레이너/글/홈 팝업을 일관된 밝은 중립·녹색 화면으로 통합했다. 없는 콘텐츠/사진은 가상 자료로 채우지 않았다. 새 JS/폰트/CDN/패키지·관리자 Paragraph 변경 없음.
