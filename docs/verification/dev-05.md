@@ -1,6 +1,6 @@
 # DEV-05-A — 네이버지도 키 없는 준비·격리 검증
 
-2026-10-05 KST. **한정 준비 코드/관련 검사 완료·Git 검토 준비. 전체 DEV-05와 실제 지도 연동은 미완료.**
+2026-10-05 KST. **한정 준비 코드/관련 검사 및 `7f878bc9501ca2888f970949123532c58b058462` 검토·정상 push 완료. 전체 DEV-05와 실제 지도 연동은 미완료.**
 
 ## 1. 승인·범위
 
@@ -61,4 +61,4 @@
 
 Q-04: 도메인 구매 예정이고 호스팅은 미선정이다. 설계자가 전달한 공식 조사에서는 [Vercel Django 지원](https://vercel.com/docs/frameworks/full-stack/django)과 [Hobby의 개인/비상업 제한](https://vercel.com/docs/plans/hobby), [OCI 무료 자원·용량/유휴 제약](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm), [Lightsail 요금](https://docs.aws.amazon.com/lightsail/latest/userguide/amazon-lightsail-bundles.html), [Render 무료 제약](https://render.com/docs/free)을 비교했다. 이는 후보 조사 인계이며 개발 담당자가 실제 호스팅을 검증·선택한 것이 아니다. 계정생성/비용/유료등록·운영배포 승인은 없고 이번 작업으로 환경을 바꾸지 않았다.
 
-최종 diff/링크·Git 제외 증거를 확인하고 개발 쓰기를 중지한 뒤 설계자에게 인계한다. Git staging/commit/push는 별도 담당자의 검토에 맡긴다. DEV-05-B/운영 배포/다른 단위를 자동 착수하지 않는다.
+최초 개발 인계 당시 최종 diff/링크·Git 제외 증거를 확인하고 개발 쓰기를 중지한 뒤 설계자에게 인계했다. Git staging/commit/push는 별도 담당자의 검토에 맡긴다. DEV-05-B/운영 배포/다른 단위를 자동 착수하지 않는다.
