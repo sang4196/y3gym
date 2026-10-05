@@ -1,8 +1,8 @@
 # 헬스장 홈페이지 — 화면·콘텐츠 명세 v0.2
 
-## DEV-06-I 모바일 탐색 — USER_ACCEPTED / GIT_REVIEW_PENDING (2026-10-06)
+## DEV-06-I 모바일 탐색 — USER_ACCEPTED / GIT_COMPLETE (2026-10-06)
 
-모바일 메뉴·반응형 보완 후 사용자 PC/모바일 배치 회귀 신고를 받아 추가 수정했다. 독립 Linux Chromium에서 구CSS/새HTML 조합으로 증상을 재현했고, 공개 CSS/JS 내용 SHA-256 버전 URL과 CSS 준비 확인 후에만 탐색을 접는 fallback을 적용했다. 서버/자산20·메뉴 Node16·HTTP16에 더해 독립 Linux Chromium6폭×6페이지36조합·실제 메뉴/키보드/resize·구CSS 실제 캐시를 남긴 일반reload·실패fallback PASS. 2026-10-06 사용자 “ㅇㅋ 확인했다”를 이번 PC/모바일 탐색 디자인 수정안 수용과 Git 인계 승인으로 기록한다(사용자 보고, 설계자 전달). 정확한 브라우저/기기·전체 접근성·관리자 검증까지 확인된 뜻은 아니다. 제품 PID613857/127.0.0.1:8766 유지, PG/SPIKE·미디어 보존. FGH는 b4d3b40 Git 완료(892bc21 기록); **I는 USER_ACCEPTED / GIT_REVIEW_PENDING이며 미커밋·Git 검토 전**이다. 설계자가 다음 Git 인계를 진행한다. 예약 PAUSED 유지. [DEV-06-I 보완 근거](verification/dev-06-i.md) 참조. 아래 디자인/PID·인계 표기는 당시 이력이다.
+모바일 메뉴·반응형 보완 후 사용자 PC/모바일 배치 회귀 신고를 받아 추가 수정했다. 독립 Linux Chromium에서 구CSS/새HTML 조합으로 증상을 재현했고, 공개 CSS/JS 내용 SHA-256 버전 URL과 CSS 준비 확인 후에만 탐색을 접는 fallback을 적용했다. 서버/자산20·메뉴 Node16·HTTP16에 더해 독립 Linux Chromium6폭×6페이지36조합·실제 메뉴/키보드/resize·구CSS 실제 캐시를 남긴 일반reload·실패fallback PASS. 2026-10-06 사용자 “ㅇㅋ 확인했다”를 이번 PC/모바일 탐색 디자인 수정안 수용과 Git 인계 승인으로 기록한다(사용자 보고, 설계자 전달). 정확한 브라우저/기기·전체 접근성·관리자 검증까지 확인된 뜻은 아니다. 제품 PID613857/127.0.0.1:8766 유지, PG/SPIKE·미디어 보존. FGH는 b4d3b40 Git 완료(892bc21 기록); **I는 사용자 수용 후 독립 Git 검토·커밋 `712377502d4deaa1d914db4391ef610284468f52`·정상 push 완료(USER_ACCEPTED / GIT_COMPLETE)**다. 구현 커밋 직후 HEAD·origin/main·실제 원격 main 일치, ahead/behind0/0·작업 트리 clean을 확인했다. 코드·기존 실행 로그와 Chromium 결과/현재 자산 해시를 대조했으며 성공 검사는 재실행하지 않았다. 예약 PAUSED 유지. [DEV-06-I 보완 근거](verification/dev-06-i.md) 참조. 아래 디자인/PID·인계 표기는 당시 이력이다.
 
 ## DEV-06-F+G+H — USER_ACCEPTED / GIT_REVIEW_PENDING (2026-10-05)
 
