@@ -3,6 +3,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parents[2]
 RUNTIME = BASE_DIR / '.runtime'
 DEBUG = False
+# DEV-05-A: no key reader/activation yet. Current BranchDTO.location stays null.
+NAVER_MAPS_ENABLED = False
+NAVER_MAPS_PUBLIC_KEY_ID = ''
 INSTALLED_APPS = [
     'content', 'wagtail.snippets', 'wagtail.users', 'wagtail.images',
     'wagtail.documents', 'wagtail.embeds', 'wagtail.sites', 'wagtail.search',

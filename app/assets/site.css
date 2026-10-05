@@ -125,3 +125,6 @@ main { min-height: 65vh; padding-bottom: clamp(3rem, 6vw, 6rem); }
   .card-content { padding: 1.25rem; }
   .home-popup { padding: 1rem; }
 }
+
+/* Provider UI retains its own logo, copyright and controls. */
+.branch-map { height: 20rem; margin-block: 1rem; }

@@ -1,4 +1,4 @@
-{% extends 'content/base.html' %}{% block content %}
+{% extends 'content/base.html' %}{% load static %}{% block content %}
 <div class="page-heading"><h1>지점 안내</h1>{% if branches %}<p>지점별 위치와 이용안내를 확인하세요.</p>{% endif %}</div>
 {% if branches|length > 1 %}<nav class="anchor-nav" aria-label="지점 바로가기">{% for branch in branches %}<a href="#branch-{{ branch.id }}">{{ branch.name }}</a>{% endfor %}</nav>{% endif %}
 {% for branch in branches %}
@@ -12,6 +12,7 @@
         <h3>위치·문의</h3>
         <address>{{ branch.address }}{% if branch.address_detail %}<br>{{ branch.address_detail }}{% endif %}</address>
         <p class="muted">방문 위치는 주소로 확인해 주세요. 자세한 안내는 아래 연락처로 문의하실 수 있습니다.</p>
+        {% if naver_maps and branch.location %}<div id="naver-map-{{ branch.id }}" class="branch-map" aria-label="네이버 지도" hidden></div>{% endif %}
         {% if branch.phone %}<p class="phone-number">전화번호 <span>{{ branch.phone.display }}</span></p>{% endif %}
         <div class="actions">
           {% if branch.phone %}<a class="button" href="{{ branch.phone.href }}">전화 문의<span class="sr-only"> — {{ branch.name }}</span></a>{% endif %}
@@ -36,4 +37,5 @@
   {% if branch.trainer_section_path %}<p class="branch-info"><a class="button secondary" href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기<span class="sr-only"> — {{ branch.name }}</span></a></p>{% endif %}
 </article>
 {% empty %}<div class="state-panel"><p>공개된 지점이 없습니다.</p><a href="/">홈으로</a></div>{% endfor %}
+{% if naver_maps %}{{ naver_maps|json_script:'naver-map-config' }}<script src="{% static 'naver-maps.js' %}" defer></script>{% endif %}
 {% endblock %}

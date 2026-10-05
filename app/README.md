@@ -1,5 +1,22 @@
 # DEV-01~04·06 — 콘텐츠 관리·공개 홈페이지
 
+## DEV-05-A 한정 준비 (2026-10-05)
+
+사용자는 Q-02 지도 제공자를 **네이버지도**로 선택했다. Q-03 실제 자료가 없어도 TEST/임시 자료로 개발하도록 승인했으며, 이번 자료는 격리 합성 검증에 한정했다. 기존 사용자 콘텐츠·계정·사진 초기화/덮어쓰기·seed 재실행 승인이 아니다. 실자료는 공개 준비 등 정말 필요한 단계에서 다시 요청한다.
+
+네이버 Geocoding 어댑터와 공개 Map/Marker JS의 키 없는 준비·모의 검증만 수행했다. 기본 비활성이고 현재 공개 `location=null`을 유지하므로 실제 지도 요청은 없다. 관리자 확인/좌표·결과·후보토큰 저장, migration, 공개 임의주소 proxy는 추가하지 않았다. 실제 인증·위치·쿼터·브라우저 및 **전체 DEV-05는 미완료**다. 구2020 약관의 저장금지와 현행 적용 미확인을 구분하며 좌표 저장/재사용·공개 JSON 전달 정책을 후속 확정한다. 기존 카카오 정책을 적용하지 않는다. 전체 Proposed를 일괄 채택하지 않는다.
+
+[DEV-05-A 보고서](../docs/verification/dev-05.md)에 설정 경계·검사·정책 출처와 미검증을 기록했다. 아래 Q-02 대기 문구는 이전 실행 이력이다. DEV-07-A 코드 검토·push는 `af954563`으로 완료됐으며 상태 정리는 `982f639`에 반영됐다.
+
+준비 코드: `content/naver_maps.py`의 `GeocodingConfig()`는 disabled이며 제품 호출 경로/환경 키 로더가 없다. 명시 설정으로만 호출 가능한 어댑터를 mock으로 검사했다. `NAVER_MAPS_ENABLED=False`, `NAVER_MAPS_PUBLIC_KEY_ID=''`가 기본이고 실제 설정 변경은 하지 않았다. Secret을 SDK 식별값 설정에 넣지 않는다. `assets/naver-maps.js`는 공개 DTO 기반 데이터가 있을 때만 SDK를 한 번 로드하고 실패 시 지도만 숨긴다. 주소·연락처는 항상 남는다.
+
+이번 관련 검사(실제 브라우저 아님):
+
+```bash
+.venv/bin/python manage.py test content.test_naver_maps content.test_presentation --settings=config.settings.test --noinput -v 2
+node --test tests/naver-maps.test.cjs
+```
+
 승인된 제품 단위다. Django/Wagtail 관리자에서 사이트 소개, 지점·시설 사진·이용안내, 트레이너·약력을 저장한다. 공개 홈(`/`)·지점(`/branches/`)·트레이너(`/trainers/`)와 공개 JSON이 같은 조회를 사용한다. DEV-02는 지점과 프로필이 모두 공개일 때만 트레이너 섹션·링크·사진 표시본을 제공한다. 지도는 Q-02 답변 대기로 location=null이며 상용 배포는 후속 단위다. 공개 화면 통합은 DEV-06에서 적용했으나 실제 브라우저 검수는 NOT_RUN이다. DEV-03은 공지·이벤트의 수정 초안/공개 리비전/인증 Preview와 `/posts/`·상세/공개 JSON을 추가했다. 실행 결과는 [DEV-01](../docs/verification/dev-01.md), [DEV-02](../docs/verification/dev-02.md), [DEV-03](../docs/verification/dev-03.md), [DEV-04 보고서](../docs/verification/dev-04.md)를 따른다.
 
 ## DEV-06 공개 화면 적용
