@@ -6,8 +6,8 @@
   <div class="{% if branch.cover_image %}split{% endif %}">
     <div>
       {% if branch.is_main %}<span class="badge">본점</span>{% endif %}
-      <h2 id="branch-title-{{ branch.id }}">{{ branch.name }}</h2>
-      {% if branch.summary %}<p class="text reading">{{ branch.summary }}</p>{% endif %}
+      <h2 data-reveal id="branch-title-{{ branch.id }}">{{ branch.name }}</h2>
+      {% if branch.summary %}<p class="text reading" data-reveal>{{ branch.summary }}</p>{% endif %}
       <div class="branch-contact">
         <h3>위치·문의</h3>
         <address>{{ branch.address }}{% if branch.address_detail %}<br>{{ branch.address_detail }}{% endif %}</address>
@@ -31,7 +31,7 @@
   </div>
   {% if branch.business_hours or branch.closed_days or branch.parking_info or branch.usage_notes %}
   <div class="branch-info">
-    <h3>이용안내</h3>
+    <h3 data-reveal>이용안내</h3>
     <dl class="info-list">
       {% if branch.business_hours %}<div><dt>운영시간</dt><dd class="text">{{ branch.business_hours }}</dd></div>{% endif %}
       {% if branch.closed_days %}<div><dt>휴무 안내</dt><dd class="text">{{ branch.closed_days }}</dd></div>{% endif %}
@@ -40,7 +40,7 @@
     </dl>
   </div>
   {% endif %}
-  {% if branch.facility_photos %}<div class="branch-info"><h3>시설 사진</h3><div class="photos">{% for photo in branch.facility_photos %}<figure><img src="{{ photo.image.url }}" alt="{{ photo.image.alt }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}" loading="lazy" decoding="async">{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div></div>{% endif %}
+  {% if branch.facility_photos %}<div class="branch-info"><h3 data-reveal>시설 사진</h3><div class="photos">{% for photo in branch.facility_photos %}<figure><img src="{{ photo.image.url }}" alt="{{ photo.image.alt }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}" loading="lazy" decoding="async">{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div></div>{% endif %}
   {% if branch.trainer_section_path %}<p class="branch-info"><a class="button secondary" href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기<span class="sr-only"> — {{ branch.name }}</span></a></p>{% endif %}
 </article>
 {% empty %}<div class="state-panel"><p>공개된 지점이 없습니다.</p><a href="/">홈으로</a></div>{% endfor %}

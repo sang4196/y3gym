@@ -187,3 +187,17 @@ class PresentationTests(PostFixture, TestCase):
         with_photo=self.soup('/')
         self.assertEqual(with_photo.select_one('.hero-image')['src'],f'http://testserver/images/display/{self.image.pk}/')
         self.assertNotIn('대표 사진을 준비 중입니다.',with_photo.get_text())
+
+    def test_reveal_is_visible_ssr_and_excludes_hero_body_popup_and_maps(self):
+        branch=self.branch(is_public=True)
+        Trainer(branch=branch,name='TEST',short_intro='TEST',profile_image=self.image,is_public=True).save()
+        self.site.introduction='TEST 소개';self.site.save()
+        post=self.create_post(body='<p>TEST body stays readable</p>')
+        for path in ['/', '/branches/', '/trainers/', '/posts/', post.get_absolute_url()]:
+            soup=self.soup(path)
+            self.assertEqual(len(soup.select('script[src="/static/reveal.js"][defer]')),1)
+            self.assertIsNone(soup.select_one('[data-reveal-state], [data-reveal][hidden], [data-reveal] [data-reveal]'))
+            self.assertIsNone(soup.select_one('header [data-reveal], footer [data-reveal], .hero [data-reveal], .post-body [data-reveal], [data-home-popup][data-reveal], [data-google-map] [data-reveal]'))
+        self.assertIn('TEST body stays readable',self.soup(post.get_absolute_url()).select_one('.post-body').text)
+        self.assertIsNotNone(self.soup('/').select_one('.branch-card[data-reveal]'))
+        self.assertIsNotNone(self.soup('/trainers/').select_one('.trainer-card[data-reveal]'))

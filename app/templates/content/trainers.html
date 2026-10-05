@@ -3,10 +3,10 @@
 {% if trainer_sections|length > 1 %}<nav class="anchor-nav" aria-label="트레이너 소속 지점 바로가기">{% for section in trainer_sections %}<a href="#branch-{{ section.branch.id }}">{{ section.branch.name }}</a>{% endfor %}</nav>{% endif %}
 {% for section in trainer_sections %}
 <section id="branch-{{ section.branch.id }}" class="section trainer-section" aria-labelledby="trainer-branch-{{ section.branch.id }}" tabindex="-1">
-  <div class="section-heading"><h2 id="trainer-branch-{{ section.branch.id }}">{{ section.branch.name }}{% if section.branch.is_main %} <span class="badge">본점</span>{% endif %}</h2><a href="{{ section.branch.page_path }}">이 지점 안내<span class="sr-only"> — {{ section.branch.name }}</span></a></div>
+  <div class="section-heading" data-reveal><h2 id="trainer-branch-{{ section.branch.id }}">{{ section.branch.name }}{% if section.branch.is_main %} <span class="badge">본점</span>{% endif %}</h2><a href="{{ section.branch.page_path }}">이 지점 안내<span class="sr-only"> — {{ section.branch.name }}</span></a></div>
   <div class="trainer-cards">
   {% for trainer in section.trainers %}
-    <article class="trainer-card card" aria-labelledby="trainer-{{ trainer.id }}">
+    <article class="trainer-card card" data-reveal aria-labelledby="trainer-{{ trainer.id }}">
       <img class="profile-image" src="{{ trainer.profile_image.url }}" alt="{{ trainer.profile_image.alt }}" width="{{ trainer.profile_image.width }}" height="{{ trainer.profile_image.height }}" loading="lazy" decoding="async">
       <div class="card-content">
         {% if trainer.job_title %}<p class="job-title">{{ trainer.job_title }}</p>{% endif %}

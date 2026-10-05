@@ -1,4 +1,4 @@
-{% load public_dates %}<article class="post-summary{% if post.cover_image %} with-image{% endif %}">
+{% load public_dates %}<article data-reveal class="post-summary{% if post.cover_image %} with-image{% endif %}">
   <div>
     <p class="post-meta"><span class="badge">{% if post.category == 'notice' %}공지사항{% else %}이벤트{% endif %}</span><time datetime="{{ post.published_at }}">{{ post.published_at|seoul_date }}</time></p>
     {% if home_summary %}<h3><a href="{{ post.detail_path }}">{{ post.title }}</a></h3>{% else %}<h2><a href="{{ post.detail_path }}">{{ post.title }}</a></h2>{% endif %}

@@ -1,6 +1,6 @@
 {% extends 'content/base.html' %}{% load static %}{% block content %}
 {% if site %}
-<section class="hero split" aria-labelledby="home-title">
+<section class="hero" aria-labelledby="home-title">
   <div class="hero-copy">
     <p class="section-label" aria-hidden="true">{{ site.brand_name }}</p>
     <h1 id="home-title" tabindex="-1" data-popup-return>{{ site.hero_title|default:site.brand_name }}</h1>
@@ -13,16 +13,16 @@
 <script defer src="{% static 'popups.js' %}"></script>
 {% if site.introduction or site.introduction_image %}
 <section class="section introduction{% if site.introduction_image %} split{% endif %}" aria-labelledby="intro-title">
-  <div><span class="section-label" aria-hidden="true">INTRODUCTION</span><h2 id="intro-title">소개</h2>{% if site.introduction %}<p class="text reading">{{ site.introduction }}</p>{% endif %}</div>
+  <div data-reveal><span class="section-label" aria-hidden="true">INTRODUCTION</span><h2 id="intro-title">소개</h2>{% if site.introduction %}<p class="text reading">{{ site.introduction }}</p>{% endif %}</div>
   {% if site.introduction_image %}<img class="feature-image" src="{{ site.introduction_image.url }}" alt="{{ site.introduction_image.alt }}" width="{{ site.introduction_image.width }}" height="{{ site.introduction_image.height }}" loading="lazy" decoding="async">{% endif %}
 </section>
 {% endif %}
 {% if branches %}
 <section class="section" aria-labelledby="branches-title">
-  <div class="section-heading"><div><span class="section-label" aria-hidden="true">OUR SPACES</span><h2 id="branches-title">지점 안내</h2></div><a href="/branches/">지점 안내 보기</a></div>
+  <div class="section-heading" data-reveal><div><span class="section-label" aria-hidden="true">OUR SPACES</span><h2 id="branches-title">지점 안내</h2></div><a href="/branches/">지점 안내 보기</a></div>
   <div class="card-grid branch-grid">
   {% for branch in branches %}
-    <article class="branch-card card">
+    <article class="branch-card card{% if branch.cover_image %} with-image{% endif %}" data-reveal>
       {% if branch.cover_image %}<img class="card-image" src="{{ branch.cover_image.url }}" alt="{{ branch.cover_image.alt }}" width="{{ branch.cover_image.width }}" height="{{ branch.cover_image.height }}" loading="lazy" decoding="async">{% endif %}
       <div class="card-content">
         {% if branch.is_main %}<span class="badge">본점</span>{% endif %}
@@ -36,7 +36,7 @@
   </div>
 </section>
 {% endif %}
-{% if trainer_sections %}<section class="section trainer-callout" aria-labelledby="trainers-title"><div><span class="section-label" aria-hidden="true">TRAINERS</span><h2 id="trainers-title">트레이너 소개</h2></div><a class="button" href="/trainers/">지점별 트레이너 보기</a></section>{% endif %}
-{% if recent_posts %}<section class="section" aria-labelledby="recent-title"><div class="section-heading"><div><span class="section-label" aria-hidden="true">NEWS &amp; EVENTS</span><h2 id="recent-title">최근 공지·이벤트</h2></div><a href="/posts/">전체 보기</a></div><div class="post-list">{% for post in recent_posts %}{% include 'content/post_summary.html' with home_summary=True %}{% endfor %}</div></section>{% endif %}
+{% if trainer_sections %}<section class="section trainer-callout" aria-labelledby="trainers-title"><div data-reveal><span class="section-label" aria-hidden="true">TRAINERS</span><h2 id="trainers-title">트레이너 소개</h2></div><a class="button" href="/trainers/">지점별 트레이너 보기</a></section>{% endif %}
+{% if recent_posts %}<section class="section" aria-labelledby="recent-title"><div class="section-heading" data-reveal><div><span class="section-label" aria-hidden="true">NEWS &amp; EVENTS</span><h2 id="recent-title">최근 공지·이벤트</h2></div><a href="/posts/">전체 보기</a></div><div class="post-list">{% for post in recent_posts %}{% include 'content/post_summary.html' with home_summary=True %}{% endfor %}</div></section>{% endif %}
 {% else %}<div class="state-panel"><p class="eyebrow">준비 중</p><h1>사이트 소개를 준비 중입니다.</h1><p>공개된 정보가 준비되면 이곳에서 확인할 수 있습니다.</p></div>{% endif %}
 {% endblock %}
