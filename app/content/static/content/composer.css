@@ -1,0 +1,16 @@
+/* Post-only sizing; native Wagtail icons, tooltips, colors and focus styling remain. */
+.product-post-body.w-panel__wrapper,
+.product-post-body .w-panel__wrapper,
+.product-post-body .w-field__wrapper { max-width: none; }
+.product-post-composer { width: 100%; min-width: 0; }
+.product-post-composer .Draftail-Toolbar { display: flex; flex-wrap: wrap; }
+.product-post-composer .public-DraftEditor-content { min-height: 12rem; }
+.product-post-composer .product-body-image { margin: 1rem 0; }
+.product-post-composer .product-body-image img { display: block; max-width: 100%; height: auto; }
+.product-post-composer .product-body-image__options { margin-top: .25rem; font-size: .875rem; }
+.product-post-composer .product-body-image__options summary { cursor: pointer; }
+.product-post-composer .product-body-image__actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+.product-post-composer .product-body-image__options :focus-visible { outline: 3px solid var(--w-color-focus); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .product-post-composer .public-DraftEditor-content { min-height: 10rem; }
+}

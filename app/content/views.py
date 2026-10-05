@@ -1,4 +1,5 @@
 import mimetypes
+from django.db import DatabaseError
 from django.http import FileResponse, Http404, HttpResponseForbidden, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -7,7 +8,7 @@ from wagtail.images import get_image_model
 from wagtail.images.models import Rendition
 from wagtail.images.permissions import permission_policy
 from wagtail.images.views.images import EditView
-from .publication import public_snapshot, public_images, DISPLAY_FILTER
+from .publication import public_snapshot, public_images, public_shell, DISPLAY_FILTER
 from .locking import content_transaction
 
 class ImageEditView(EditView):
@@ -76,9 +77,17 @@ def private_file(request, name):
         return HttpResponseForbidden('이미지 접근 권한이 필요합니다.')
     return file_response(field)
 
+def render_public_error(request, message, status):
+    try:
+        shell = public_shell()
+    except DatabaseError:
+        # A database outage must not turn error rendering into another DB failure.
+        shell = {'brand_name': '', 'has_trainers': False}
+    return render(request, 'content/error.html', {'message': message, 'public_shell': shell}, status=status)
+
 def not_found(request, exception):
     if request.path.startswith('/api/'): return error('NOT_FOUND','콘텐츠를 찾을 수 없습니다.',404)
-    return render(request,'content/error.html',{'message':'페이지를 찾을 수 없습니다.'},status=404)
+    return render_public_error(request, '페이지를 찾을 수 없습니다.', 404)
 def server_error(request):
     if request.path.startswith('/api/'): return error('SERVER_ERROR','일시적인 오류입니다.',500)
-    return render(request,'content/error.html',{'message':'일시적인 오류입니다.'},status=500)
+    return render_public_error(request, '일시적인 오류입니다.', 500)

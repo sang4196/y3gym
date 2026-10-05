@@ -7,7 +7,9 @@ The y3gym website made solely with Codex
 
 ## 문서
 
-DEV-02 트레이너·약력 관리와 지점별 공개 HTML/JSON·이미지 권한을 추가했다. 실제 PostgreSQL28개 검사와 로컬8766 적용을 완료했고 실제 트레이너 브라우저는 NOT_RUN, Git 검토는 대기다. 세부 결과·보존·검증 계층은 [DEV-02 보고서](docs/verification/dev-02.md)를 따른다. DEV-01의 한정 채택 기술과 해당 저장/이미지 정책을 Trainer 범위로 확장했으며 전체 Proposed나 운영 배포를 일괄 승인하지 않는다.
+DEV-02 트레이너·약력 관리와 지점별 공개 HTML/JSON·이미지 권한을 추가했다. 실제 PostgreSQL28개 검사와 로컬8766 적용을 완료했고 실제 트레이너 브라우저는 NOT_RUN이며 Git 검토·정상 push는 `d8bdec0`으로 완료했다. 세부 결과·보존·검증 계층은 [DEV-02 보고서](docs/verification/dev-02.md)를 따른다. DEV-01의 한정 채택 기술과 해당 저장/이미지 정책을 Trainer 범위로 확장했으며 전체 Proposed나 운영 배포를 일괄 승인하지 않는다.
+
+DEV-03 공지·이벤트 수정 초안/공개/Preview·복원, 홈 최근3건·목록/상세 HTML/JSON·공개 이미지 관계 인덱스를 구현했다. 실제 PostgreSQL46개와 편집기 Node7개 PASS, 로컬8766 적용·기존 콘텐츠/SPIKE 보존 확인을 마쳤다. 실제 브라우저는 NOT_RUN, Git 검토는 대기다. [DEV-03 보고서](docs/verification/dev-03.md)에서 계층별 근거와 남은 범위를 확인한다.
 
 | 경로 | 내용·상태 |
 |---|---|

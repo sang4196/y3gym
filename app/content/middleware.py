@@ -5,6 +5,10 @@ from django.utils.deprecation import MiddlewareMixin
 class BoundaryMiddleware(MiddlewareMixin):
     def process_view(self, request, view, args, kwargs):
         match = request.resolver_match
+        if match.namespace == 'wagtailsnippets_content_post' and match.url_name in {'delete', 'revisions_unschedule'}:
+            return HttpResponseForbidden('게시글 영구 삭제·예약 작업은 제공하지 않습니다.')
+        if match.url_name == 'wagtail_bulk_action' and kwargs.get('app_label') == 'content' and kwargs.get('model_name') == 'post':
+            return HttpResponseForbidden('게시글은 한 건씩 편집·공개·철회하세요. 일괄 작업은 제공하지 않습니다.')
         # Explicitly block destructive Wagtail paths even if permission is later misassigned.
         if match.namespace == 'wagtailimages' and match.url_name in {'delete','delete_multiple','delete_upload_multiple'}:
             return HttpResponseForbidden('원본 이미지 영구 삭제는 제공하지 않습니다.')

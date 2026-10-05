@@ -2,7 +2,12 @@ from django.urls import path, include
 from wagtail.admin import urls as admin_urls
 from wagtail.admin.auth import require_admin_access
 from content import views
+from content import post_views
 urlpatterns = [
+    path('posts/',post_views.posts,name='posts'),
+    path('posts/<int:pk>/',post_views.post_detail,name='post-detail'),
+    path('api/v1/posts/',post_views.posts_api,name='posts-api'),
+    path('api/v1/posts/<int:pk>/',post_views.post_api,name='post-api'),
     path('admin/images/<int:image_id>/',require_admin_access(views.ImageEditView.as_view())),
     path('admin/',include(admin_urls)),
     path('',views.home,name='home'),

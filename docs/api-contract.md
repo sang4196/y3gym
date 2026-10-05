@@ -21,6 +21,14 @@ location=null, trainer_section_path=null이며 나머지 엔드포인트/지도�
 
 빈 목록200, 미지원 질의400 INVALID_QUERY, 쓰기405 METHOD_NOT_ALLOWED, 문자열ID와 meta.server_time, 관리자 세션으로 공개 범위가 늘어나지 않는 규칙을 적용했다. 부모·약력·지점 연결과 DTO/이미지 변환까지 PG shared lock으로 함께 읽는다. 검사 계층·실제 브라우저 미실행은 [DEV-02 보고서](verification/dev-02.md)에 기록했다. 나머지 API·Popup/지도 등은 후속 범위다.
 
+## DEV-03 적용 기록 — 2026-10-05
+
+순차 승인 범위에서 §4.4~4.5의 `/api/v1/posts/`·`/api/v1/posts/{id}/`와 대응 HTML/홈 최근3건을 구현했다. Summary/Detail 필드·문자열ID·선택 대표이미지 null·UTC Z 시각·meta.server_time·no-store를 유지한다. 공개 리비전의 category로 SQL 필터/total을 계산하고 최초 공개 시각 DESC, 숫자 PK DESC로 정렬한다. 공개 updated_at은 마지막 공개 시각이며 초안 저장 시각이 아니다.
+
+질의는 category 생략/notice/event, page 기본1 양의 ASCII 정수, page_size 기본10·최대50이다. 알 수 없는 키·중복 키(같은 값도 포함)·빈 값·부호/소수·잘못된 값은400 INVALID_QUERY다. 유효한 범위 밖 페이지는200/빈items/정확한total/has_next=false이며 거대한 SQL OFFSET을 실행하지 않는다. 상세의 질의 키는 지원하지 않는다. 비공개/미존재는 같은404, 관리자 세션도 공개범위를 넓히지 않으며 쓰기는405다.
+
+body_html은 p/br/h2/강조/목록/안전한 링크/이미지로 변환한다. CMS embed는 공개 표시 URL로 바꾸고 raw img/script/style·인라인 이벤트·위험한 스킴·CMS 전용 링크는 제거한다. http(s)/mailto/tel, 문서내 #앵커, 고정 공개 경로(/, /posts/, 숫자ID상세, /branches/, /trainers/)만 링크 대상으로 허용한다. 인증 Preview는 같은 변환에 보호 이미지 URL을 사용한다. 실제 실행 계층은 [DEV-03 보고서](verification/dev-03.md); 별도 제품 JS 소비자나 실제 브라우저 렌더링 PASS를 주장하지 않는다.
+
 ## 1. API의 경계
 
 고객에게 이미 공개하기로 한 콘텐츠의 **조회 전용** API다. 회원가입, 고객 로그인, 예약·결제, PT 관리, 트레이너 업무 계정, 관리자용 공개 CRUD API는 추가하지 않는다.

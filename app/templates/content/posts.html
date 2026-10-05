@@ -1,0 +1,6 @@
+{% extends 'content/base.html' %}
+{% block title %}공지·이벤트{% endblock %}
+{% block content %}<h1>공지·이벤트</h1>
+<nav aria-label="게시글 분류">{% for filter in filters %}<a href="{{ filter.url }}">{{ filter.label }}</a> {% endfor %}</nav>
+{% for post in items %}{% include 'content/post_summary.html' %}{% empty %}<p>등록된 게시글이 없습니다.</p>{% endfor %}
+<nav aria-label="페이지">{% if previous_url %}<a href="{{ previous_url }}">이전</a>{% endif %} <span>{{ pagination.page }} 페이지</span> {% if next_url %}<a href="{{ next_url }}">다음</a>{% endif %}</nav>{% endblock %}

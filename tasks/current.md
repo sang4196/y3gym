@@ -1,5 +1,32 @@
 # 현재 작업 — 제품 순차 개발
 
+## DEV-03 Git P2 후속 수정 — 재인계, 쓰기 중지
+
+- Git 검토의 게시글 목록/상세 브랜드·트레이너 메뉴 누락을 수정했다. HTML 전용 public_shell은 브랜드명과 공개 지점+공개 프로필 EXISTS만 읽으며 사진/본문/약력 전체를 중복 생성하지 않는다. 기존 홈/지점/트레이너는 이미 조회한 결과에서 셸을 구성한다. Post/셸 DTO 완료까지 PG shared 경계를 유지하고 공개 API 필드는 그대로다.
+- 인증 Preview·검증 오류와 일반400/404/500도 같은 공개 셸을 사용한다. DB 자체 장애일 때만 최소 fallback, 초안 내용을 공개 조회에 섞지 않는다.
+- 관련 전용 PostgreSQL **6개/2.770s PASS**, system check0. 있음/없음/비공개 소속·5종 공개 화면/Preview/오류·경량조회·API 경계를 실제 템플릿으로 검사했다. 기존46개/Node7개는 당시 성공 이력이며 이번에 반복하거나52개 전체 실행으로 보고하지 않는다. 브라우저 NOT_RUN.
+- 확인한 기존 제품506850만 종료→**새 PID508585/127.0.0.1:8766** 유지. PG456028/SPIKE452717 유지. 기존 콘텐츠/Post/참조/권한/제품·SPIKE미디어 전후 동일. Post0/참조0, 계정/암호/세션/seed/migration/의존성/권한 쓰기 없음.
+- 증거 `app/.runtime/dev-03-shell-20261005T023314552503Z/`, [보고서 §7](../docs/verification/dev-03.md). 공개HTTP11건 기대 상태/no-store·기존JSON3건 동일 및 정상/404 HTML 셸 대조 PASS.
+- 최종 diff 점검을 완료하고 개발 쓰기를 다시 중지했다. 설계자 재인계 후 Git 검토를 계속하며 Git 쓰기/DEV-04/운영 배포는 하지 않았다. 아래 기존 PID·인계 문구는 이력이다.
+
+## 현재 배정: DEV-03 공지·이벤트 제품 구현
+
+- 2026-10-05 설계자 지시로 DEV-03을 시작한다. 기준 HEAD `d8bdec0ef8e08f1facb060101fa3f800f5c5c526`, 작업 트리 clean을 직접 확인했다. DEV-02는 Git 검토·commit/정상 push 완료이며 실제 Trainer 브라우저 NOT_RUN은 유지한다. 아래 Git 대기 문구는 인계 당시 이력이다.
+- 범위: 제품 Post/Wagtail Paragraph 편집·수정초안/공개/철회/인증 Preview/과거 리비전 초안복원, 홈 최근3건·목록/상세 HTML 및 공개 JSON, 공개 리비전 기반 시각/분류/본문과 원자적 이미지 참조 인덱스. title/대표alt200자, 최초 공개시각 유지, 공개 updated_at 분리, 목록 category/page/page_size 계약을 적용한다.
+- 완료 조건: 실제 전용 PostgreSQL 정상/거부 CMS POST·공개본 유지·복원/유실파일·미디어/권한·rollback/동시성·기존28개 회귀, 필요한 additive migration/최소 그룹권한/루프백8766 적용, 사용자 콘텐츠/계정/미디어·SPIKE 보존 근거와 docs/verification/dev-03.md 기록 후 쓰기중지·설계자 인계.
+- 기존 공개 Post 전체를 O(n) 스캔하는 실험 방식은 제품 이미지 경로에 복사하지 않는다. 공식 설치 Wagtail의 제공 경로를 확인하고 미지원 bulk/예약 경로는 명시 차단한다. 실제 브라우저는 별도 NOT_RUN이며 도구 오류 재시도·기존 성공 검사의 무근거 반복은 하지 않는다.
+- Popup은 DEV-04(모든 팝업 게시글 필수 연결). 제품 DB seed/초기화/임의 글·실사업 자료 생성·암호/세션 변경·SPIKE 코드/서버 변경·Git 쓰기·상용배포·DEV-04 동시착수는 하지 않는다. 전체 Proposed를 일괄 승격하지 않는다.
+
+## DEV-03 결과 — 구현·PG 검증·로컬 적용 완료, Git 검토 대기
+
+- 공지·이벤트 Post/Paragraph 편집·초안/명시 공개·단건 철회·인증 Preview·과거 버전의 새 초안 복원, 홈 최근3건/목록·상세 HTML/JSON, 최초/마지막 공개 시각, 공개 리비전 category 필터·total·페이지 분할을 구현했다.
+- PostImageUse 관계 인덱스를 실제 공개/철회와 동일 PG 잠금/트랜잭션으로 갱신한다. 인덱스 revision=live_revision·live 조건의 SQL EXISTS이며 O(n) Post 스캔 없음. stale/실패 rollback·권한/파일·허용 HTML·미지원 bulk/예약/overwrite·삭제 차단을 적용했다.
+- 실제 전용 PostgreSQL **46개/32.140s PASS**(기존28+Post18). Node7개 PASS(모의 계약1+설치 라이브러리 상태 전이6). 최종 템플릿 날짜경계 렌더·check·migration diff·37개 패키지 호환 PASS. 초기 실패2회와 수정 원인은 보고서에 보존. 실제 브라우저는 **NOT_RUN**, 도구 재시도/브라우저 대체 PASS 없음.
+- content.0003_posts와 기존 운영자 그룹의 Post add/change/view/publish4개만 적용. 계정/암호/세션 save·시드 없음. 개발 Post/PostImageUse **0/0**. bleach6.4.0/webencodings0.6.1만 제품 venv/lock에 추가, 기존 버전 유지.
+- 검증한 제품 PID464276만 종료 후 **새 PID506850/127.0.0.1:8766**으로 적용·유지. PG456028·SPIKE452717/8765 유지. Site/Branch/사진/Trainer/Career/이미지 행 해시·제품 미디어7파일·SPIKE A1/19·B3/3/해당 revision·미디어31파일 전후 동일. 기존 공개 JSON3건 payload(meta 제외) 동일, 적용 후11개 무쿠키 HTTP 기대 상태/no-store PASS.
+- 근거 `app/.runtime/dev-03-20261005T021401622565Z/`, 상세 [DEV-03 보고서](../docs/verification/dev-03.md). 실제 브라우저 최소 확인 계획은 보고서 §5에서 설계자에게만 묶어 전달한다. PostgreSQL 서버 검사를 화면 확인으로 확대하지 않는다.
+- 최종 문서/diff 점검을 완료하고 개발 쓰기를 중지했다. 설계자→Git 담당자 검토로 인계한다. Git 쓰기/전체 Proposed 승격/운영 배포/DEV-04 착수 없음.
+
 ## DEV-02 결과 — 구현·PG 검증·로컬 적용 완료, Git 검토 대기
 
 - 2026-10-05 KST: Trainer/Career 한국어 부모 인라인 관리, 지점/프로필 동시 공개 필터, `/trainers/`·`/api/v1/trainer-sections/`, 조건부 홈/지점 연결, Trainer 사진 SQL EXISTS를 구현했다. 동일ID 소속 이동, 지점 비공개 시 자체 상태/약력 유지, 즉시 반영·공개 필수값·원자성·stale/타부모ID 방어를 적용했다.

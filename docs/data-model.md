@@ -22,6 +22,14 @@ SiteContent/Branch/BranchPhoto와 해당 P-01~04는 사용자 승인 범위에�
 
 Trainer/약력은 같은 PG 트랜잭션·콘텐츠 잠금으로 저장하며 edit_version 충돌과 타부모 약력ID를 거부한다. DB는 단일 필수 소속, 공개 이름/사진/소개, 고정 약력 분류·비어 있지 않은 약력 내용을 제약한다. 프로필·지점 모두 공개인 경우만 DTO/이미지 공개 사용처에 포함하며 지점 비공개는 프로필을 변경하지 않는다. 트레이너는 지점 내 sort_order/ID, 약력은 고정 분류 순서와 각 분류 내 sort_order/ID로 표시한다. 세부 테스트와 raw SQL 등 비지원 편집 경계는 [DEV-02 보고서](verification/dev-02.md)를 따른다. 다른 모델/정책 전체를 채택한 것은 아니다.
 
+## DEV-03 적용 기록 — 2026-10-05
+
+Post에 Wagtail DraftStateMixin/RevisionMixin/PreviewableMixin을 적용했다. title200자·notice/event·연속 RichText body·선택 cover_image FK/PROTECT·cover_alt200자·비공개 edit_version을 둔다. 빈 초안은 허용하지만 공개에는 공백을 제외한 제목과 본문 텍스트 또는 유효한 본문 이미지가 필요하며 모든 참조 이미지의 존재/파일/선택 권한을 재검증한다. 대표 이미지만 있는 빈 본문은 공개하지 않는다.
+
+실제 live_revision이 공개 제목·분류·본문·이미지의 기준이다. 최초 first_published_at은 철회/재공개에도 유지하고 last_published_at은 명시적 공개 때만 바뀐다. 초안 저장·Preview·과거 리비전의 새 초안 복원은 공개본/시각에 반영하지 않는다. 기존 리비전은 덮어쓰지 않는다. 자동저장·수동 날짜·예약·일괄 작업·워크플로는 제공하지 않는다.
+
+파생 PostImageUse(post, revision, image; post/image unique)는 실제 공개된 대표/본문 이미지 집합만 담는다. 공개/철회·시각·리비전·이 인덱스를 공통 PG exclusive lock 및 한 트랜잭션으로 변경하고, 공개 조회/DTO 변환은 동일 shared lock 안에서 완료한다. 표시본 권한은 SQL EXISTS에 live와 인덱스 revision_id=post.live_revision_id 조건을 함께 적용한다. 초안·과거 리비전을 인덱스에 넣거나 모든 Post 본문을 스캔하지 않는다. 기존 Site/Branch/Trainer 공개 사용처와 합쳐 마지막 참조가 없어지면 차단한다. 지원 경로/한계·원자성 검사는 [DEV-03 보고서](verification/dev-03.md)를 따른다.
+
 ## 1. 문서의 지위와 범위
 
 `docs/screens.md`의 확정 제품 기준을 보존한다. 그 문서의 화면 배치·공개 정책 제안이 파일에 저장되었다는 이유만으로 모두 확정된 것으로 취급하지 않는다. 본 문서에서 새로 정의하는 필드명, 저장 방식, 제약, 삭제 정책은 기술 설계 제안이다.
