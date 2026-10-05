@@ -50,6 +50,7 @@ class FixtureMixin:
     def form_data(self,branch,**changes):
         data={field.name:getattr(branch,field.name) for field in Branch._meta.fields if field.name not in ['id','cover_image']}
         data['cover_image']=branch.cover_image_id or ''
+        data['google_map_input']=branch.google_embed_url
         data.update({'photos-TOTAL_FORMS':'0','photos-INITIAL_FORMS':'0','photos-MIN_NUM_FORMS':'0','photos-MAX_NUM_FORMS':'1000'})
         for name in ['is_main','is_public']:
             if not data[name]: data.pop(name)

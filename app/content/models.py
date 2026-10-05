@@ -73,6 +73,9 @@ class Branch(ClusterableModel):
     cover_alt = models.CharField('대표 사진 대체 설명', max_length=200, blank=True)
     address = models.CharField('기본 주소', max_length=255, blank=True)
     address_confirmed = models.BooleanField(default=False, editable=False)
+    google_embed_url = models.TextField(blank=True, default='', editable=False)
+    google_map_address = models.CharField(max_length=255, blank=True, default='', editable=False)
+    google_map_confirmed = models.BooleanField(default=False, editable=False)
     address_detail = models.CharField('상세 주소', max_length=255, blank=True)
     phone = models.CharField('전화번호', max_length=30, blank=True)
     kakao_channel_url = models.URLField('카카오톡 채널', max_length=300, blank=True)
@@ -134,15 +137,20 @@ class Branch(ClusterableModel):
             if self.is_main:
                 cls.objects.filter(is_main=True).exclude(pk=self.pk).update(is_main=False, edit_version=F('edit_version')+1)
             self.full_clean()
-            # Only the operator's intent about this input address is retained.
-            # No provider result enters this transaction or the model.
-            intent = getattr(self, '_map_confirmation', None)
-            self.address_confirmed = bool(current and current.address_confirmed and current.address == self.address)
+            # Legacy Naver state is retained as history, never promoted to Google.
+            from .google_maps import validate_embed_url
+            if self.google_embed_url:
+                validate_embed_url(self.google_embed_url)
+            intent = getattr(self, '_google_map_confirmation', None)
+            self.google_map_confirmed = bool(current and current.google_map_confirmed
+                and current.address == self.address and current.google_map_address == self.address
+                and current.google_embed_url == self.google_embed_url and self.google_embed_url)
+            self.google_map_address = current.google_map_address if self.google_map_confirmed else ''
             if intent is not None:
-                from .naver_maps import display_key
-                if not display_key() or not self.address or intent != (self.address, self.edit_version):
-                    raise ValidationError('현재 기본 주소의 위치를 다시 확인하세요.')
-                self.address_confirmed = True
+                if not self.address or not self.google_embed_url or intent != (self.address, self.google_embed_url, self.edit_version):
+                    raise ValidationError('현재 기본 주소와 지도의 위치를 다시 확인하세요.')
+                self.google_map_confirmed = True
+                self.google_map_address = self.address
             # Form-time checks are deferred, but every model constraint is
             # validated against the final state under the exclusive lock.
             super().validate_constraints()
@@ -154,7 +162,7 @@ class Branch(ClusterableModel):
             result = super().save(*args, **kwargs)
             if cls.objects.filter(is_public=True).exists() and cls.objects.filter(is_public=True, is_main=True).count() != 1:
                 raise ValidationError('공개 본점은 정확히 하나여야 합니다.')
-            self._map_confirmation = None
+            self._google_map_confirmation = None
             return result
 
 class BranchPhoto(Orderable):
@@ -254,7 +262,7 @@ class TrainerCareer(Orderable):
 
 # Forms are imported lazily by Wagtail after app initialization.
 from django import forms
-Branch.panels = [FieldPanel('edit_version', widget=forms.HiddenInput), MultiFieldPanel([FieldPanel(x) for x in ['name','is_public','is_main','replacement_main','sort_order']], heading='공개와 본점', help_text=SAVE_NOTICE), MultiFieldPanel([FieldPanel(x) for x in ['summary','cover_image','cover_alt','address','address_detail','map_confirmation','map_confirmation_address','map_confirmation_version','phone','kakao_channel_url','business_hours','closed_days','parking_info','usage_notes']], heading='지점 안내', help_text='주소는 위치 확인 없이도 저장할 수 있습니다. 기본 주소를 바꾸면 위치 확인이 해제됩니다.'), InlinePanel('photos', label='시설 사진')]
+Branch.panels = [FieldPanel('edit_version', widget=forms.HiddenInput), MultiFieldPanel([FieldPanel(x) for x in ['name','is_public','is_main','replacement_main','sort_order']], heading='공개와 본점', help_text=SAVE_NOTICE), MultiFieldPanel([FieldPanel(x) for x in ['summary','cover_image','cover_alt','address','address_detail','google_map_input','map_confirmation','map_confirmation_address','map_confirmation_version','map_confirmation_url','phone','kakao_channel_url','business_hours','closed_days','parking_info','usage_notes']], heading='지점 안내', help_text='주소는 위치 확인 없이도 저장할 수 있습니다. 기본 주소를 바꾸면 위치 확인이 해제됩니다.'), InlinePanel('photos', label='시설 사진')]
 
 from .post_models import Post, PostImageUse
 

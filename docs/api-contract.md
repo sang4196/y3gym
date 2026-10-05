@@ -1,5 +1,15 @@
 # 헬스장 홈페이지 — 공개 API 계약 v0.2
 
+## DEV-05-C Google 수동 퍼가기 적용 (2026-10-05)
+
+사용자 지정에 따라 주소 자동조회 대신 Google 지도 공유/퍼가기 HTML 또는 그 안의 정식 URL을 지점별로 등록·직접 확인하는 방식으로 전환했다. raw HTML은 실행/저장하지 않고 검증 URL만 저장한다. 기존 Branch 권한·CSRF·edit_version/부모사진 원자성을 유지하며 URL 교체/기본주소 변경은 확인 해제, 상세주소만 변경은 유지한다. 기존 Naver 확인을 승계하지 않는다.
+
+공개 location=null, 유효하게 확인된 공개 지점만 map={provider:'google',mode:'embed',embed_url:검증URL}이다. 클릭 전 외부 요청 없이 안내·버튼을 제공하고 클릭 후 고정 iframe을 연다. 닫기/재시도·15초 timeout·pagehide 정리/bfcache 자동 로드 방지를 제공한다. iframe load는 실제 지도/위치 성공 증명이 아니다. Naver 실제 경로 사용을 중단하고 기존 비활성 코드/설정·이력을 보존했다. API 키/Cloud 가입·결제/주소 자동조회는 사용하지 않는다.
+
+서로 다른 관련47개(43PG/HTML+4파서)·최종 fakeDOM12개·실제 루프백HTTP14건 PASS. additive0006/빈 지도필드3개만 적용했고 현재 제품 PID569586/127.0.0.1:8766 유지, PG456028/SPIKE452717 보존. 기존 콘텐츠/리비전·계정 메타/권한·미디어는 보존했고 시작15→적용전/후16개 썸네일 추가 관찰은 원복하지 않았다. 실제 Google 표시/위치·브라우저/관리자 클릭/접근성·전체DEV05/운영은 미완료다. 이전 Post 초안 한정 사용자 보고 PASS는 유지한다. 아래 자동조회·Naver 계약·이전 PID/선택 대기는 과거 이력이다.
+
+[DEV-05-C 근거·검증·관리자 사용 절차](verification/dev-05-c.md)를 따른다. 개발 쓰기 중지 후 Git 검토 대기이며 stage/commit/push·운영 배포는 실행하지 않았다.
+
 ## DEV-05-B 주소 확인·지도 표시 (2026-10-05)
 
 네이버 Maps 전용 현행 연결 약관(시행2025-03-20, 확인2026-10-05)에 따라 결과 좌표/주소/후보를 저장·재사용하지 않는 흐름을 이번 단위의 구현 기준으로 채택했다. 자체 기본주소와 운영자 확인 상태만 저장하고 기본주소 변경 시 같은 부모 트랜잭션에서 확인을 무효화한다. 상세주소만 변경하면 유지한다. 기존 Branch 권한·CSRF·edit_version·부모/사진 원자성을 유지한다.
@@ -165,15 +175,15 @@ P-01 Proposed: SiteContent는 별도 수정 초안 없이 유효한 저장 커�
 | business_hours / closed_days | string? / string? |
 | parking_info / usage_notes | string? / string? |
 | location | null 고정; 제공자 좌표를 배포하지 않음 |
-| map | 확인된 공개 지점만 `{provider: "naver", query: 현재 기본주소}`; 그 외 null. 자체 입력 콘텐츠이며 지도 성공 결과가 아님 |
+| map | 등록·확인이 유효한 공개 지점만 `{provider: "google", mode: "embed", embed_url: 검증URL}`; 그 외 null. iframe 내용/위치 성공 보증 아님 |
 | facility_photos | `{image: Image, caption: string?}`[] |
 | trainer_section_path | string?; 해당 지점 공개 트레이너가 있을 때만 경로 제공 |
 
-공개 지점만 포함하고 본점 우선·설정 순서로 반환한다. 지도 상태의 원본 오류나 내부 검증용 주소는 반환하지 않는다. location은 null이며 주소 확인이 유효한 공개 지점만 map을 제공한다. 기본주소 변경 직후 map은 null이다. SDK 표시 설정은 이 자체 콘텐츠와 별도다.
+공개 지점만 포함하고 본점 우선·설정 순서로 반환한다. 지도 상태의 원본 오류나 내부 검증용 주소는 반환하지 않는다. location은 null이며 주소 확인이 유효한 공개 지점만 map을 제공한다. 기본주소/URL 변경 후 새 확인 없이 저장하면 map은 null이다. 기존 naver/query 계약은 google/embed/embed_url로 대체됐다.
 
 P-01 Proposed: BranchDTO는 지점·시설 사진 배치·이용안내의 일관된 부모 저장 결과를 반환한다. 일부 하위 항목만 저장되거나 동시 조회에서 구/신 항목이 혼합되지 않도록 DB·조회 계층도 검증한다. facility_photos는 부모 지점의 배치만 포함하며 sort_order, 동률 ID 순으로 반환한다. P-02 Proposed의 최초 0개 상태는 빈 목록이지만, 운영 중 마지막 공개 지점 비공개는 관리자 저장에서 차단해야 한다. 공개 GET이 이 변경 제약을 집행하는 것은 아니다.
 
-분리 프론트도 map.query로 표시 시마다 공식 SDK를 새로 조회하고 결과를 저장·재사용하지 않는다. 결과 좌표/반환주소/원본응답/서명토큰은 API에 추가하지 않는다. 상세한 단일 결과·주소 일치·오류·수명주기는 DEV-05-B 보고서를 따른다.
+분리 프론트도 방문자의 명시적 지도 보기 후 검증 embed_url을 앱이 생성한 고정 iframe에만 적용한다. raw HTML을 전달하지 않고 iframe load를 위치 성공으로 해석하지 않는다. 서버 지오코딩/좌표/제공자 응답을 API에 추가하지 않는다. 별도 JS 클라이언트 실브라우저 검증은 미실행이며 수명주기·검증은 DEV-05-C 보고서를 따른다.
 
 ### 4.3 TrainerSectionDTO / TrainerDTO
 

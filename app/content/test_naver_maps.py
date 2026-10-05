@@ -133,22 +133,9 @@ class MapPageTests(TestCase):
             self.assertIsNone(page_config([{'id':'1','address':'TEST address','map':spec}],enabled=True,key_id='TEST'))
 
     @override_settings(NAVER_MAPS_ENABLED=True,NAVER_MAPS_PUBLIC_KEY_ID='TEST_PUBLIC')
-    def test_page_contract_escapes_and_whitelists_only_own_address(self):
-        from .publication import public_snapshot
-        snapshot=public_snapshot()
-        dto=snapshot['branches'][0]
-        dto['map']={'provider':'naver','query':dto['address']}
-        dto['location']=None
-        dto['name']='TEST </script><script>attack</script>'
-        dto['provider_raw']='TEST PRIVATE PROVIDER';dto['secret']='TEST SECRET'
-        with patch('content.views.public_snapshot',return_value=snapshot), patch('content.naver_maps.http.client.HTTPSConnection') as transport:
-            response=self.client.get('/branches/')
-        soup=BeautifulSoup(response.content,'html.parser')
-        config=json.loads(soup.select_one('#naver-map-config').string)
-        self.assertEqual(config,{'keyId':'TEST_PUBLIC','items':[{'id':str(self.branch.pk),'query':dto['address']}]})
-        self.assertEqual(len(soup.select('script[src="/static/naver-maps.js"]')),1)
-        self.assertTrue(soup.select_one('#naver-map-'+str(self.branch.pk)).has_attr('hidden'))
-        self.assertNotContains(response,'TEST PRIVATE PROVIDER');self.assertNotContains(response,'TEST SECRET')
-        self.assertContains(response,'TEST address');self.assertContains(response,'tel:')
-        self.assertNotContains(response,'<script>attack</script>')
-        transport.assert_not_called()
+    def test_legacy_confirmed_address_never_activates_naver_or_google(self):
+        Branch.objects.filter(pk=self.branch.pk).update(address_confirmed=True)
+        response=self.client.get('/branches/')
+        self.assertNotContains(response,'naver-maps.js')
+        self.assertNotContains(response,'google-maps.js')
+        self.assertIsNone(self.client.get('/api/v1/branches/').json()['items'][0]['map'])

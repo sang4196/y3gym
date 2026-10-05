@@ -1,9 +1,11 @@
-<div data-branch-map data-map-key="{{ map_key }}">
+<div data-branch-google-map>
 {% include "django/forms/widgets/hidden.html" %}
-<p>위치 확인: <span data-saved-map-status>{% if saved_confirmed == "true" %}저장된 주소 확인됨{% else %}미확인{% endif %}</span></p>
-<p>지도를 열면 입력한 기본 주소와 지도 이용 정보가 네이버에 제공·보관·활용될 수 있습니다. 현재 위치는 수집하지 않습니다.</p>
-<button type="button" class="button button-secondary" data-map-open{% if not map_key %} disabled{% endif %}>입력 주소 위치 확인</button>
-<button type="button" class="button button-secondary" data-map-confirm disabled>이 위치 확인</button>
-<p data-map-status role="status" aria-live="polite">{% if not map_key %}지도 연결이 준비되지 않아 위치 확인은 할 수 없습니다. 주소는 확인 없이 저장할 수 있습니다.{% else %}지도의 위치를 살펴보고 확인한 다음 지점 전체를 저장하세요.{% endif %}</p>
-<div class="admin-branch-map" data-map-canvas aria-label="입력 주소 네이버 지도" hidden></div>
+<p>저장된 지도: <span data-saved-map-status>{% if saved_confirmed == "true" %}운영자 위치 확인됨{% else %}미등록 또는 미확인{% endif %}</span></p>
+<p>지도를 열면 Google에 연결되며 접속·지도 이용 정보가 제공될 수 있습니다. 표시된 위치가 입력한 기본 주소와 일치하는지 직접 확인하세요. 자동 주소 검색은 하지 않습니다.</p>
+<button type="button" class="button button-secondary" data-map-open>입력한 지도 열기</button>
+<button type="button" class="button button-secondary" data-map-close hidden>지도 닫기</button>
+<button type="button" class="button button-secondary" data-map-confirm disabled>주소와 이 지도 위치 확인</button>
+<p data-map-status role="status" aria-live="polite">지도는 선택 사항입니다. 주소는 확인 없이 저장할 수 있습니다. 위치 확인 후 지점 전체를 저장하세요.</p>
+<div class="admin-branch-map" data-map-canvas hidden></div>
+<noscript>위치 확인에는 JavaScript가 필요합니다. 주소와 미확인 지도 코드는 그대로 저장할 수 있습니다.</noscript>
 </div>

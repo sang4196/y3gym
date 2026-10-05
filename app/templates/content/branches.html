@@ -12,12 +12,13 @@
         <h3>위치·문의</h3>
         <address>{{ branch.address }}{% if branch.address_detail %}<br>{{ branch.address_detail }}{% endif %}</address>
         <p class="muted">방문 위치는 주소로 확인해 주세요. 자세한 안내는 아래 연락처로 문의하실 수 있습니다.</p>
-        {% if naver_maps and branch.map %}
-        <div data-public-map="{{ branch.id }}">
-          <p class="muted">지도를 열면 네이버에 연결되어 지점 주소와 지도 이용 정보가 제공·보관·활용될 수 있습니다. 현재 위치는 수집하지 않습니다.</p>
-          <button type="button" class="button secondary" data-map-open>네이버지도 보기</button>
+        {% if branch.map %}
+        <div data-google-map data-embed-url="{{ branch.map.embed_url }}" data-map-title="{{ branch.name }} Google 지도">
+          <p class="muted">지도를 열면 Google에 연결되며 접속·지도 이용 정보가 제공될 수 있습니다.</p>
+          <button type="button" class="button secondary" data-map-open>Google 지도 보기</button>
+          <button type="button" class="button secondary" data-map-close hidden>지도 닫기</button>
           <p data-map-status role="status" aria-live="polite"></p>
-          <div id="naver-map-{{ branch.id }}" class="branch-map" aria-label="네이버 지도" hidden></div>
+          <div class="branch-map" data-map-canvas hidden></div>
         </div>{% endif %}
         {% if branch.phone %}<p class="phone-number">전화번호 <span>{{ branch.phone.display }}</span></p>{% endif %}
         <div class="actions">
@@ -43,5 +44,5 @@
   {% if branch.trainer_section_path %}<p class="branch-info"><a class="button secondary" href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기<span class="sr-only"> — {{ branch.name }}</span></a></p>{% endif %}
 </article>
 {% empty %}<div class="state-panel"><p>공개된 지점이 없습니다.</p><a href="/">홈으로</a></div>{% endfor %}
-{% if naver_maps %}{{ naver_maps|json_script:'naver-map-config' }}<script src="{% static 'naver-maps.js' %}" defer></script>{% endif %}
+{% if has_google_maps %}<script src="{% static 'google-maps.js' %}" defer></script>{% endif %}
 {% endblock %}

@@ -12,7 +12,6 @@ from wagtail.images.views.images import EditView
 from .publication import public_snapshot, public_images, public_shell, DISPLAY_FILTER
 from .locking import content_transaction
 from .presentation import page_meta
-from .naver_maps import page_config
 
 class ImageEditView(EditView):
     @property
@@ -48,8 +47,7 @@ def home(request):
 @require_safe
 def branches(request):
     snapshot = public_snapshot()
-    snapshot['naver_maps'] = page_config(snapshot['branches'], enabled=settings.NAVER_MAPS_ENABLED,
-                                        key_id=settings.NAVER_MAPS_PUBLIC_KEY_ID)
+    snapshot['has_google_maps'] = any(branch['map'] for branch in snapshot['branches'])
     snapshot['page'] = page_meta('지점 안내', snapshot['public_shell'],
                                 ' · '.join(branch['name'] for branch in snapshot['branches']) + ' — 주소, 연락처와 이용안내' if snapshot['branches'] else '공개된 지점이 없습니다.', section='branches')
     return render(request,'content/branches.html',snapshot)

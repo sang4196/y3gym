@@ -5,6 +5,7 @@ from django.db.models import Q, Exists, OuterRef, Prefetch, F
 from wagtail.images import get_image_model
 from .models import SiteContent, Branch, BranchPhoto, Trainer, TrainerCareer, PostImageUse
 from .locking import content_transaction
+from .google_maps import map_dto
 
 DISPLAY_FILTER = 'max-1200x900|format-png'
 
@@ -56,7 +57,7 @@ def site_dto(site):
 def branch_dto(branch):
     import re
     phone = {'display':branch.phone, 'href':'tel:'+re.sub(r'[^+0-9]', '', branch.phone)} if branch.phone else None
-    return {'id':str(branch.pk), 'name':branch.name, 'is_main':branch.is_main, 'summary':optional(branch.summary), 'cover_image':image_dto(branch.cover_image,branch.cover_alt), 'address':branch.address, 'address_detail':optional(branch.address_detail), 'phone':phone, 'kakao_channel_url':optional(branch.kakao_channel_url), 'business_hours':optional(branch.business_hours), 'closed_days':optional(branch.closed_days), 'parking_info':optional(branch.parking_info), 'usage_notes':optional(branch.usage_notes), 'location':None, 'map':{'provider':'naver','query':branch.address} if branch.is_public and branch.address_confirmed and branch.address else None, 'trainer_section_path':f'/trainers/#branch-{branch.pk}' if branch.public_trainers else None, 'facility_photos':[{'image':image_dto(photo.image,photo.alt),'caption':optional(photo.caption)} for photo in branch.photos.all()]}
+    return {'id':str(branch.pk), 'name':branch.name, 'is_main':branch.is_main, 'summary':optional(branch.summary), 'cover_image':image_dto(branch.cover_image,branch.cover_alt), 'address':branch.address, 'address_detail':optional(branch.address_detail), 'phone':phone, 'kakao_channel_url':optional(branch.kakao_channel_url), 'business_hours':optional(branch.business_hours), 'closed_days':optional(branch.closed_days), 'parking_info':optional(branch.parking_info), 'usage_notes':optional(branch.usage_notes), 'location':None, 'map':map_dto(branch), 'trainer_section_path':f'/trainers/#branch-{branch.pk}' if branch.public_trainers else None, 'facility_photos':[{'image':image_dto(photo.image,photo.alt),'caption':optional(photo.caption)} for photo in branch.photos.all()]}
 
 def trainer_dto(trainer):
     groups = {category: [] for category in TrainerCareer.Category.values}
