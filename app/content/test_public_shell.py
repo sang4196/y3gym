@@ -27,6 +27,18 @@ class PublicShellTests(PostFixture, TestCase):
         self.assertEqual(soup.select_one('header .brand').get_text(), 'TEST SHELL BRAND')
         self.assertEqual(soup.select_one('footer .brand').get_text(), 'TEST SHELL BRAND')
         self.assertEqual(bool(soup.select_one('header nav a[href="/trainers/"]')), has_trainers)
+        panel = soup.select_one('#primary-navigation')
+        toggle = soup.select_one('[data-menu-toggle]')
+        self.assertEqual(len(soup.select('#primary-navigation')), 1)
+        self.assertNotIn('hidden', panel.attrs)  # no-JS/failed-script fallback
+        self.assertIn('hidden', toggle.attrs)
+        self.assertEqual(toggle['aria-controls'], panel['id'])
+        self.assertEqual(toggle['aria-expanded'], 'false')
+        self.assertEqual(toggle['aria-label'], '메뉴 열기')
+        self.assertEqual(len(soup.select('header nav')), 1)
+        self.assertEqual(len(soup.select('script[src^="/static/navigation.js?v="][defer]')), 1)
+        self.assertIsNone(panel.select_one('[data-reveal], [hidden]'))
+        self.assertEqual(soup.select('header .contact-cta'), panel.select('.contact-cta'))
         for path in ['/', '/branches/', '/posts/']:
             self.assertIsNotNone(soup.select_one(f'header nav a[href="{path}"]'))
 
@@ -53,7 +65,7 @@ class PublicShellTests(PostFixture, TestCase):
             response=server_error(RequestFactory().get('/posts/'))
         self.assertEqual(response.status_code,500)
         soup=BeautifulSoup(response.content,'html.parser')
-        self.assertEqual(soup.select_one('header > a').get_text(),'홈')
+        self.assertEqual(soup.select_one('header .brand').get_text(),'홈')
         self.assertIsNone(soup.select_one('header nav a[href="/trainers/"]'))
         self.assertNotIn(b'TEST database unavailable',response.content)
 

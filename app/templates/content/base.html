@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load public_assets %}<!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -6,14 +6,19 @@
   <title>{{ page.title|default:'홈페이지' }}</title>
   {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
   {% if page.noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
-  <link rel="stylesheet" href="{% static 'site.css' %}">
+  <link rel="stylesheet" href="{% public_static 'site.css' %}">
 </head>
 <body>
 <a class="skip-link" href="#main-content">본문 바로가기</a>
-<header class="site-header wrap">
+<header class="site-header" data-navigation>
+ <div class="wrap header-inner">
   <a class="brand" href="/">{% if public_shell.logo %}<img class="logo" src="{{ public_shell.logo.url }}" alt="{{ public_shell.logo.alt }}" width="{{ public_shell.logo.width }}" height="{{ public_shell.logo.height }}">{% endif %}<span>{{ public_shell.brand_name|default:'홈' }}</span></a>
+  <button class="menu-toggle" type="button" aria-controls="primary-navigation" aria-expanded="false" aria-label="메뉴 열기" data-menu-toggle hidden><span class="menu-toggle-lines" aria-hidden="true"><span></span><span></span><span></span></span></button>
+  <div id="primary-navigation" class="header-navigation" data-menu-panel>
   <nav aria-label="주 메뉴">{% include 'content/menu.html' %}</nav>
   {% if public_shell.contact_path %}<a class="button contact-cta" href="{{ public_shell.contact_path }}">지점별 문의</a>{% endif %}
+  </div>
+ </div>
 </header>
 <main id="main-content" class="{% block main_class %}wrap{% endblock %}" tabindex="-1">{% block content %}{% endblock %}</main>
 <footer class="site-footer">
@@ -23,6 +28,7 @@
     {% if public_shell.contact_path %}<div class="footer-contact"><p class="footer-label">문의</p><a class="button contact-cta" href="{{ public_shell.contact_path }}">지점별 문의</a></div>{% endif %}
   </div>
 </footer>
-<script defer src="{% static 'reveal.js' %}"></script>
+<script defer src="{% public_static 'navigation.js' %}"></script>
+<script defer src="{% public_static 'reveal.js' %}"></script>
 </body>
 </html>

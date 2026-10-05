@@ -158,7 +158,7 @@ class PresentationTests(PostFixture, TestCase):
         SiteContent.objects.all().delete()  # isolated test DB only
         soup=self.soup('/',503)
         self.assertIn('noindex',soup.select_one('meta[name="robots"]')['content'])
-        self.assertIsNone(soup.select_one('[data-home-popup], script[src$="popups.js"]'))
+        self.assertIsNone(soup.select_one('[data-home-popup], script[src^="/static/popups.js?v="]'))
 
     def test_excerpt_does_not_emit_markup_or_join_block_words(self):
         self.assertEqual(excerpt('<h2>제목</h2><p>앞<strong>중간</strong>끝<br>다음</p><script>숨김</script>',html=True),'제목 앞중간끝 다음')
@@ -195,7 +195,7 @@ class PresentationTests(PostFixture, TestCase):
         post=self.create_post(body='<p>TEST body stays readable</p>')
         for path in ['/', '/branches/', '/trainers/', '/posts/', post.get_absolute_url()]:
             soup=self.soup(path)
-            self.assertEqual(len(soup.select('script[src="/static/reveal.js"][defer]')),1)
+            self.assertEqual(len(soup.select('script[src^="/static/reveal.js?v="][defer]')),1)
             self.assertIsNone(soup.select_one('[data-reveal-state], [data-reveal][hidden], [data-reveal] [data-reveal]'))
             self.assertIsNone(soup.select_one('header [data-reveal], footer [data-reveal], .hero [data-reveal], .post-body [data-reveal], [data-home-popup][data-reveal], [data-google-map] [data-reveal]'))
         self.assertIn('TEST body stays readable',self.soup(post.get_absolute_url()).select_one('.post-body').text)

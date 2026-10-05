@@ -1,5 +1,9 @@
 # y3gym
 
+## DEV-06-I 모바일 탐색 — USER_ACCEPTED / GIT_REVIEW_PENDING (2026-10-06)
+
+모바일 메뉴·반응형 보완 후 사용자 PC/모바일 배치 회귀 신고를 받아 추가 수정했다. 독립 Linux Chromium에서 구CSS/새HTML 조합으로 증상을 재현했고, 공개 CSS/JS 내용 SHA-256 버전 URL과 CSS 준비 확인 후에만 탐색을 접는 fallback을 적용했다. 서버/자산20·메뉴 Node16·HTTP16에 더해 독립 Linux Chromium6폭×6페이지36조합·실제 메뉴/키보드/resize·구CSS 실제 캐시를 남긴 일반reload·실패fallback PASS. 2026-10-06 사용자 “ㅇㅋ 확인했다”를 이번 PC/모바일 탐색 디자인 수정안 수용과 Git 인계 승인으로 기록한다(사용자 보고, 설계자 전달). 정확한 브라우저/기기·전체 접근성·관리자 검증까지 확인된 뜻은 아니다. 제품 PID613857/127.0.0.1:8766 유지, PG/SPIKE·미디어 보존. FGH는 b4d3b40 Git 완료(892bc21 기록); **I는 USER_ACCEPTED / GIT_REVIEW_PENDING이며 미커밋·Git 검토 전**이다. 설계자가 다음 Git 인계를 진행한다. 예약 PAUSED 유지. [DEV-06-I 보완 근거](docs/verification/dev-06-i.md) 참조. 아래 디자인/PID·인계 표기는 당시 이력이다.
+
 ## DEV-06-F+G+H — USER_ACCEPTED / GIT_REVIEW_PENDING (2026-10-05)
 
 F의 폰트·G의 크기/간격/구조 포커스 보정을 유지하고 H에서 하늘색 버튼 채움을 제거했다. 본문 주요 버튼은 잉크네이비/흰 글자, 어두운 hero는 오프화이트/잉크 글자, 헤더·푸터·보조 버튼은 중립색 테두리 중심이다. hover/active/disabled와 푸터 글자색 우선순위를 정리했다. 대비75조합·HTTP11/공개 HTML·JSON 유지 확인 PASS, 에이전트 직접 브라우저 렌더·클릭 검수는 NOT_RUN. 제품587307/8766·PG/SPIKE 재시작 없음. E는92880bc Git 완료; **2026-10-05 사용자 “ㅇㅋ 일단 이정도면 되겠다”로 현재 F+G+H 누적 디자인을 수용했다(사용자 보고). USER_ACCEPTED / GIT_REVIEW_PENDING이며 아직 미커밋·Git 검토 전**이다. 설계자가 Git 담당 인계를 진행할 수 있다. 모든 페이지·모바일·키보드·포커스/지도·자동 브라우저 검사 PASS나 전체 DEV-06/제품 출시 완료를 뜻하지 않는다. 새 디자인 수정도 사용자 승인 후 Git 검토 원칙을 유지한다. 쓰기 중지·예약 PAUSED 유지. [DEV-06-H 결과](docs/verification/dev-06-h.md) 참조. 아래 기록은 이전 이력이다.

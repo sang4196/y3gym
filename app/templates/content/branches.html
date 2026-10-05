@@ -1,4 +1,4 @@
-{% extends 'content/base.html' %}{% load static %}{% block content %}
+{% extends 'content/base.html' %}{% load public_assets %}{% block content %}
 <div class="page-heading"><p class="section-label" aria-hidden="true">BRANCHES</p><h1>지점 안내</h1>{% if branches %}<p>지점별 위치와 이용안내를 확인하세요.</p>{% endif %}</div>
 {% if branches|length > 1 %}<nav class="anchor-nav" aria-label="지점 바로가기">{% for branch in branches %}<a href="#branch-{{ branch.id }}">{{ branch.name }}</a>{% endfor %}</nav>{% endif %}
 {% for branch in branches %}
@@ -44,5 +44,5 @@
   {% if branch.trainer_section_path %}<p class="branch-info"><a class="button secondary" href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기<span class="sr-only"> — {{ branch.name }}</span></a></p>{% endif %}
 </article>
 {% empty %}<div class="state-panel"><p>공개된 지점이 없습니다.</p><a href="/">홈으로</a></div>{% endfor %}
-{% if has_google_maps %}<script src="{% static 'google-maps.js' %}" defer></script>{% endif %}
+{% if has_google_maps %}<script src="{% public_static 'google-maps.js' %}" defer></script>{% endif %}
 {% endblock %}

@@ -1,4 +1,4 @@
-{% extends 'content/base.html' %}{% load static %}{% block main_class %}home-main{% endblock %}{% block content %}
+{% extends 'content/base.html' %}{% load public_assets %}{% block main_class %}home-main{% endblock %}{% block content %}
 {% if site %}
 <section class="hero" aria-labelledby="home-title">
   <div class="wrap hero-layout{% if site.hero_image %} has-visual{% endif %}">
@@ -14,7 +14,7 @@
 </section>
 <div class="wrap home-content">
 <section class="home-popup" data-home-popup hidden aria-labelledby="home-popup-title" aria-live="polite" tabindex="0"></section>
-<script defer src="{% static 'popups.js' %}"></script>
+<script defer src="{% public_static 'popups.js' %}"></script>
 {% if site.introduction or site.introduction_image %}
 <section class="section introduction editorial-section" aria-labelledby="intro-title">
   <div class="section-heading" data-reveal><span class="section-label" aria-hidden="true">INTRODUCTION</span><h2 id="intro-title">소개</h2></div>
