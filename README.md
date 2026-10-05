@@ -11,7 +11,9 @@ DEV-02 트레이너·약력 관리와 지점별 공개 HTML/JSON·이미지 권�
 
 DEV-03 공지·이벤트 수정 초안/공개/Preview·복원, 홈 최근3건·목록/상세 HTML/JSON·공개 이미지 관계 인덱스를 구현했다. 실제 PostgreSQL46개와 편집기 Node7개 PASS, 로컬8766 적용·기존 콘텐츠/SPIKE 보존 확인을 마쳤다. 실제 브라우저는 NOT_RUN이며 Git 검토·정상 push는 `e54d34f`로 완료했다. [DEV-03 보고서](docs/verification/dev-03.md)에서 계층별 근거와 남은 범위를 확인한다.
 
-DEV-04 기간제 팝업을 구현했다. 모든 팝업의 게시글 연결은 필수이며 글당 최대1개 설정, 현재값 저장·기간 후보/API·조건부 이미지 권한·정상 홈 안내/닫기/오늘숨김을 적용했다. 실제 PG68개 PASS 및 Unicode 길이 수정 후 팝업 Node16개 PASS, 로컬8766 적용/자료 보존 완료, 실제 브라우저 NOT_RUN·Git 검토 대기다. [DEV-04 보고서](docs/verification/dev-04.md)를 따른다.
+DEV-04 기간제 팝업을 구현했다. 모든 팝업의 게시글 연결은 필수이며 글당 최대1개 설정, 현재값 저장·기간 후보/API·조건부 이미지 권한·정상 홈 안내/닫기/오늘숨김을 적용했다. 실제 PG68개 PASS 및 Unicode 길이 수정 후 팝업 Node16개 PASS, 로컬8766 적용/자료 보존 완료, 실제 브라우저 NOT_RUN이며 Git 검토·정상 push는 `0b3bccb`로 완료했다. [DEV-04 보고서](docs/verification/dev-04.md)를 따른다.
+
+DEV-06 공개 화면·공통 문의 동선·메타데이터를 통합했다. PG76개·팝업 Node16개 PASS, 로컬8766 적용과 기존 자료 보존을 확인했다. 실제 브라우저는 NOT_RUN, Git 검토 대기이며 지도(Q-02)는 답변 대기다. [DEV-06 보고서](docs/verification/dev-06.md)를 따른다.
 
 | 경로 | 내용·상태 |
 |---|---|

@@ -1,15 +1,39 @@
-{% extends 'content/base.html' %}{% block title %}지점 안내{% endblock %}{% block content %}<h1>지점 안내</h1>
-{% if branches|length > 1 %}<nav aria-label="지점 바로가기">{% for branch in branches %}<a href="#branch-{{ branch.id }}">{{ branch.name }}</a>{% endfor %}</nav>{% endif %}
-{% for branch in branches %}<article id="branch-{{ branch.id }}"><h2>{{ branch.name }}{% if branch.is_main %} · 본점{% endif %}</h2>
-{% if branch.summary %}<p class="text">{{ branch.summary }}</p>{% endif %}
-{% if branch.cover_image %}<img src="{{ branch.cover_image.url }}" alt="{{ branch.cover_image.alt }}" width="{{ branch.cover_image.width }}" height="{{ branch.cover_image.height }}">{% endif %}
-<p>{{ branch.address }}{% if branch.address_detail %} {{ branch.address_detail }}{% endif %}</p>
-{% if branch.phone %}<p><a href="{{ branch.phone.href }}">전화 {{ branch.phone.display }}</a></p>{% endif %}
-{% if branch.kakao_channel_url %}<p><a href="{{ branch.kakao_channel_url }}">카카오톡 문의</a></p>{% endif %}
-{% if branch.business_hours %}<h3>운영시간</h3><p class="text">{{ branch.business_hours }}</p>{% endif %}
-{% if branch.closed_days %}<h3>휴무 안내</h3><p>{{ branch.closed_days }}</p>{% endif %}
-{% if branch.parking_info %}<h3>주차 안내</h3><p class="text">{{ branch.parking_info }}</p>{% endif %}
-{% if branch.usage_notes %}<h3>이용안내</h3><p class="text">{{ branch.usage_notes }}</p>{% endif %}
-{% if branch.facility_photos %}<h3>시설 사진</h3><div class="photos">{% for photo in branch.facility_photos %}<figure><img src="{{ photo.image.url }}" alt="{{ photo.image.alt }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}">{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div>{% endif %}
-{% if branch.trainer_section_path %}<p><a href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기</a></p>{% endif %}
-</article>{% empty %}<p>공개된 지점이 없습니다.</p>{% endfor %}{% endblock %}
+{% extends 'content/base.html' %}{% block content %}
+<div class="page-heading"><h1>지점 안내</h1>{% if branches %}<p>지점별 위치와 이용안내를 확인하세요.</p>{% endif %}</div>
+{% if branches|length > 1 %}<nav class="anchor-nav" aria-label="지점 바로가기">{% for branch in branches %}<a href="#branch-{{ branch.id }}">{{ branch.name }}</a>{% endfor %}</nav>{% endif %}
+{% for branch in branches %}
+<article id="branch-{{ branch.id }}" class="section branch-detail" aria-labelledby="branch-title-{{ branch.id }}" tabindex="-1">
+  <div class="{% if branch.cover_image %}split{% endif %}">
+    <div>
+      {% if branch.is_main %}<span class="badge">본점</span>{% endif %}
+      <h2 id="branch-title-{{ branch.id }}">{{ branch.name }}</h2>
+      {% if branch.summary %}<p class="text reading">{{ branch.summary }}</p>{% endif %}
+      <div class="branch-contact">
+        <h3>위치·문의</h3>
+        <address>{{ branch.address }}{% if branch.address_detail %}<br>{{ branch.address_detail }}{% endif %}</address>
+        <p class="muted">방문 위치는 주소로 확인해 주세요. 자세한 안내는 아래 연락처로 문의하실 수 있습니다.</p>
+        {% if branch.phone %}<p class="phone-number">전화번호 <span>{{ branch.phone.display }}</span></p>{% endif %}
+        <div class="actions">
+          {% if branch.phone %}<a class="button" href="{{ branch.phone.href }}">전화 문의<span class="sr-only"> — {{ branch.name }}</span></a>{% endif %}
+          {% if branch.kakao_channel_url %}<a class="button secondary" href="{{ branch.kakao_channel_url }}">카카오톡 문의<span class="sr-only"> — {{ branch.name }}</span></a>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% if branch.cover_image %}<img class="feature-image" src="{{ branch.cover_image.url }}" alt="{{ branch.cover_image.alt }}" width="{{ branch.cover_image.width }}" height="{{ branch.cover_image.height }}" loading="lazy" decoding="async">{% endif %}
+  </div>
+  {% if branch.business_hours or branch.closed_days or branch.parking_info or branch.usage_notes %}
+  <div class="branch-info">
+    <h3>이용안내</h3>
+    <dl class="info-list">
+      {% if branch.business_hours %}<div><dt>운영시간</dt><dd class="text">{{ branch.business_hours }}</dd></div>{% endif %}
+      {% if branch.closed_days %}<div><dt>휴무 안내</dt><dd class="text">{{ branch.closed_days }}</dd></div>{% endif %}
+      {% if branch.parking_info %}<div><dt>주차 안내</dt><dd class="text">{{ branch.parking_info }}</dd></div>{% endif %}
+      {% if branch.usage_notes %}<div><dt>기타 안내</dt><dd class="text">{{ branch.usage_notes }}</dd></div>{% endif %}
+    </dl>
+  </div>
+  {% endif %}
+  {% if branch.facility_photos %}<div class="branch-info"><h3>시설 사진</h3><div class="photos">{% for photo in branch.facility_photos %}<figure><img src="{{ photo.image.url }}" alt="{{ photo.image.alt }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}" loading="lazy" decoding="async">{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div></div>{% endif %}
+  {% if branch.trainer_section_path %}<p class="branch-info"><a class="button secondary" href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기<span class="sr-only"> — {{ branch.name }}</span></a></p>{% endif %}
+</article>
+{% empty %}<div class="state-panel"><p>공개된 지점이 없습니다.</p><a href="/">홈으로</a></div>{% endfor %}
+{% endblock %}

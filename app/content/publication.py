@@ -9,11 +9,25 @@ from .locking import content_transaction
 DISPLAY_FILTER = 'max-1200x900|format-png'
 
 def public_shell():
-    """HTML-only navigation: no image renditions or full content projections."""
+    """HTML-only scalars, an optional logo and at most two contact target IDs."""
     with content_transaction(read=True):
-        brand = SiteContent.objects.values_list('brand_name', flat=True).first()
+        site = SiteContent.objects.values('brand_name', 'logo_id', 'logo_alt', 'logo__width', 'logo__height').first()
         has_trainers = Trainer.objects.filter(is_public=True, branch__is_public=True).exists()
-        return {'brand_name': brand or '', 'has_trainers': has_trainers}
+        branch_ids = list(Branch.objects.filter(is_public=True).values_list('pk', flat=True)[:2])
+        return shell_dto(site, has_trainers, branch_ids)
+
+def shell_dto(site, has_trainers, branch_ids):
+    brand = site['brand_name'] if site else ''
+    logo = None
+    if brand and site['logo_id']:
+        # The protected display route keeps the original aspect ratio. No rendition
+        # or storage URL is needed merely to build navigation.
+        logo = {'url': f"/images/display/{site['logo_id']}/", 'alt': site['logo_alt'],
+                'width': site['logo__width'], 'height': site['logo__height']}
+    contact_path = None
+    if branch_ids:
+        contact_path = f'/branches/#branch-{branch_ids[0]}' if len(branch_ids) == 1 else '/branches/'
+    return {'brand_name': brand, 'logo': logo, 'has_trainers': has_trainers, 'contact_path': contact_path}
 
 def public_images():
     from .popup_publication import active_popups
@@ -69,4 +83,7 @@ def public_snapshot():
         trainers = Trainer.objects.filter(is_public=True).select_related('profile_image').prefetch_related('careers')
         branches = list(Branch.objects.filter(is_public=True).select_related('cover_image').prefetch_related('photos__image', Prefetch('trainers', queryset=trainers, to_attr='public_trainers')))
         return {'site':site_dto(site), 'branches':[branch_dto(branch) for branch in branches], 'trainer_sections':[trainer_section_dto(branch) for branch in branches if branch.public_trainers], 'recent_posts':recent_posts(),
-                'public_shell': {'brand_name': site.brand_name if site else '', 'has_trainers': any(branch.public_trainers for branch in branches)}}
+                'public_shell': shell_dto(
+                    {'brand_name': site.brand_name, 'logo_id': site.logo_id, 'logo_alt': site.logo_alt,
+                     'logo__width': site.logo.width if site.logo else None, 'logo__height': site.logo.height if site.logo else None} if site else None,
+                    any(branch.public_trainers for branch in branches), [branch.pk for branch in branches[:2]])}

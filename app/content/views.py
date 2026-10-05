@@ -10,6 +10,7 @@ from wagtail.images.permissions import permission_policy
 from wagtail.images.views.images import EditView
 from .publication import public_snapshot, public_images, public_shell, DISPLAY_FILTER
 from .locking import content_transaction
+from .presentation import page_meta
 
 class ImageEditView(EditView):
     @property
@@ -36,15 +37,25 @@ def branches_api(request):
 @require_safe
 def home(request):
     snapshot=public_snapshot()
+    site = snapshot['site']
+    snapshot['page'] = page_meta((site['hero_title'] or site['brand_name']) if site else '사이트 소개를 준비 중입니다.',
+                                snapshot['public_shell'], (site['hero_description'] or site['introduction'] or '') if site else '',
+                                section='home', noindex=not site)
     return render(request,'content/home.html',snapshot,status=200 if snapshot['site'] else 503)
 
 @require_safe
 def branches(request):
-    return render(request,'content/branches.html',public_snapshot())
+    snapshot = public_snapshot()
+    snapshot['page'] = page_meta('지점 안내', snapshot['public_shell'],
+                                ' · '.join(branch['name'] for branch in snapshot['branches']) + ' — 주소, 연락처와 이용안내' if snapshot['branches'] else '공개된 지점이 없습니다.', section='branches')
+    return render(request,'content/branches.html',snapshot)
 
 @require_safe
 def trainers(request):
-    return render(request, 'content/trainers.html', public_snapshot())
+    snapshot = public_snapshot()
+    snapshot['page'] = page_meta('트레이너 소개', snapshot['public_shell'],
+                                ' · '.join(section['branch']['name'] for section in snapshot['trainer_sections']) + ' — 트레이너 프로필과 약력' if snapshot['trainer_sections'] else '공개된 트레이너 소개가 없습니다.', section='trainers')
+    return render(request, 'content/trainers.html', snapshot)
 
 @require_safe
 def trainer_sections_api(request):
@@ -83,7 +94,8 @@ def render_public_error(request, message, status):
     except DatabaseError:
         # A database outage must not turn error rendering into another DB failure.
         shell = {'brand_name': '', 'has_trainers': False}
-    return render(request, 'content/error.html', {'message': message, 'public_shell': shell}, status=status)
+    return render(request, 'content/error.html', {'message': message, 'public_shell': shell,
+                  'page': page_meta(message, shell, noindex=True), 'status_code': status}, status=status)
 
 def not_found(request, exception):
     if request.path.startswith('/api/'): return error('NOT_FOUND','콘텐츠를 찾을 수 없습니다.',404)

@@ -1,1 +1,27 @@
-{% load static %}<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}{{ public_shell.brand_name|default:'홈페이지 준비 중' }}{% endblock %}</title><link rel="stylesheet" href="{% static 'site.css' %}"></head><body><header><a href="/">{{ public_shell.brand_name|default:'홈' }}</a><nav aria-label="주 메뉴"><a href="/">홈</a><a href="/branches/">지점 안내</a>{% if public_shell.has_trainers %}<a href="/trainers/">트레이너 소개</a>{% endif %}<a href="/posts/">공지·이벤트</a></nav></header><main>{% block content %}{% endblock %}</main><footer>{{ public_shell.brand_name }}</footer></body></html>
+{% load static %}<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title|default:'홈페이지' }}</title>
+  {% if page.description %}<meta name="description" content="{{ page.description }}">{% endif %}
+  {% if page.noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+  <link rel="stylesheet" href="{% static 'site.css' %}">
+</head>
+<body>
+<a class="skip-link" href="#main-content">본문 바로가기</a>
+<header class="site-header wrap">
+  <a class="brand" href="/">{% if public_shell.logo %}<img class="logo" src="{{ public_shell.logo.url }}" alt="{{ public_shell.logo.alt }}" width="{{ public_shell.logo.width }}" height="{{ public_shell.logo.height }}">{% endif %}<span>{{ public_shell.brand_name|default:'홈' }}</span></a>
+  <nav aria-label="주 메뉴">{% include 'content/menu.html' %}</nav>
+  {% if public_shell.contact_path %}<a class="button contact-cta" href="{{ public_shell.contact_path }}">지점별 문의</a>{% endif %}
+</header>
+<main id="main-content" class="wrap" tabindex="-1">{% block content %}{% endblock %}</main>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <a class="brand" href="/">{% if public_shell.logo %}<img class="logo" src="{{ public_shell.logo.url }}" alt="{{ public_shell.logo.alt }}" width="{{ public_shell.logo.width }}" height="{{ public_shell.logo.height }}" loading="lazy">{% endif %}<span>{{ public_shell.brand_name|default:'홈' }}</span></a>
+    <nav aria-label="하단 메뉴">{% include 'content/menu.html' %}</nav>
+    {% if public_shell.contact_path %}<a class="contact-cta" href="{{ public_shell.contact_path }}">지점별 문의</a>{% endif %}
+  </div>
+</footer>
+</body>
+</html>

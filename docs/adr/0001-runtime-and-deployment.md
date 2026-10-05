@@ -23,6 +23,12 @@ Django5.2.17·Wagtail7.4.3 LTS·Pillow12.3.0·psycopg[binary]3.3.6을 Python3.14
 
 순차 승인 범위의 Popup은 기존 WSL Linux venv/PG18.6/템플릿·vanilla JS로 구현했다. 신규 의존성/운영 서비스/스케줄러 없이 content.0004_popup 테이블·제약과 일반 운영자의 Popup add/change/view만 additive 적용한다. 현재시각 후보/SQL EXISTS 이미지 판정과 PG 공통 잠금을 유지한다. 실제 PG68개(기존52+팝업16), 새 Node13개와 루프백 적용의 계층별 결과는 [DEV-04 보고서](../verification/dev-04.md). 실제 브라우저·상용 서버/배포·대량성능은 미검증이며 전체 ADR은 Proposed를 유지한다.
 
+## DEV-06 한정 적용 기록 — 2026-10-05
+
+기존 서버 템플릿/CSS에서 공개 화면·문의·메타데이터를 통합했다. HTML 전용 셸은 브랜드/로고 scalar·공개 트레이너 EXISTS·공개 지점ID 최대2개만 조회하고 Post DTO와 shared lock 경계를 유지한다. 메타는 실제 공개 리비전만 사용하며 인증 Preview/오류/503은 noindex다. 공개 API·DB 저장/공개·이미지 보호 정책·관리자 편집은 변경하지 않았다. 새 의존성/서비스/마이그레이션/권한 적용 없이 PG76개·팝업 Node16개를 검사하고 로컬8766에 적용했다.
+
+[DEV-06 보고서](../verification/dev-06.md)에 셸/HTML·보존·미검증을 구분한다. 실제 모바일/확대/키보드·접근성은 NOT_RUN이며 지도Q-02/계정·키/좌표 정책 및 운영 배포는 대기다. 전체 ADR/P 제안을 일괄 Accepted로 바꾸지 않는다.
+
 ## 1. 배경
 
 현재 조건(2026-09-18 SPIKE-01 갱신)은 Windows 호스트 위 WSL Ubuntu 개발, 향후 별도 Linux 상용 서버 배포, 이후 고객 프론트 분리다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python·셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS / WSL2 커널 / Python 3.14.4 / ext4 저장소다. Windows 제품·버전, WSL 패키지 버전, 운영 Linux 배포판·버전·호스팅·실행 방식은 TBD다. `review-resolution.md`의 Windows 중심 설명은 원문 기록으로 보존한다.

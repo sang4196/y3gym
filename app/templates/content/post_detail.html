@@ -1,7 +1,9 @@
-{% extends 'content/base.html' %}
-{% block title %}{{ post.title|default:'제목 없는 초안' }}{% endblock %}
-{% block content %}{% if preview %}<p role="status">수정 초안 미리보기 · 공개본에는 아직 반영되지 않았습니다.</p>{% endif %}
-{% load public_dates %}<article><h1>{{ post.title|default:'제목 없는 초안' }}</h1>
-<p>{% if post.category == 'notice' %}공지사항{% else %}이벤트{% endif %}{% if post.published_at %} · <time datetime="{{ post.published_at }}">{{ post.published_at|seoul_date }}</time>{% endif %}</p>
-{% if post.cover_image %}<img src="{{ post.cover_image.url }}" alt="{{ post.cover_image.alt }}" width="{{ post.cover_image.width }}" height="{{ post.cover_image.height }}">{% endif %}
-<div class="post-body">{{ post.body_html|safe }}</div></article><p><a href="/posts/">목록으로</a></p>{% endblock %}
+{% extends 'content/base.html' %}{% load public_dates %}{% block content %}
+{% if preview %}<p class="preview-notice" role="status">수정 초안 미리보기 · 공개본에는 아직 반영되지 않았습니다.</p>{% endif %}
+<article class="post-detail">
+  <div class="page-heading"><p class="post-meta"><span class="badge">{% if post.category == 'notice' %}공지사항{% else %}이벤트{% endif %}</span>{% if post.published_at %}<time datetime="{{ post.published_at }}">{{ post.published_at|seoul_date }}</time>{% endif %}</p><h1>{{ post.title|default:'제목 없는 초안' }}</h1></div>
+  {% if post.cover_image %}<img class="post-cover" src="{{ post.cover_image.url }}" alt="{{ post.cover_image.alt }}" width="{{ post.cover_image.width }}" height="{{ post.cover_image.height }}" fetchpriority="high">{% endif %}
+  <div class="post-body">{{ post.body_html|lazy_images|safe }}</div>
+</article>
+<p class="back-link"><a class="button secondary" href="/posts/">목록으로</a></p>
+{% endblock %}

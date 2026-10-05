@@ -24,8 +24,8 @@ class PublicShellTests(PostFixture, TestCase):
     def assert_shell(self, response, has_trainers, status=200):
         self.assertEqual(response.status_code, status)
         soup = BeautifulSoup(response.content, 'html.parser')
-        self.assertEqual(soup.select_one('header > a').get_text(), 'TEST SHELL BRAND')
-        self.assertEqual(soup.select_one('footer').get_text(), 'TEST SHELL BRAND')
+        self.assertEqual(soup.select_one('header .brand').get_text(), 'TEST SHELL BRAND')
+        self.assertEqual(soup.select_one('footer .brand').get_text(), 'TEST SHELL BRAND')
         self.assertEqual(bool(soup.select_one('header nav a[href="/trainers/"]')), has_trainers)
         for path in ['/', '/branches/', '/posts/']:
             self.assertIsNotNone(soup.select_one(f'header nav a[href="{path}"]'))
@@ -78,10 +78,14 @@ class PublicShellTests(PostFixture, TestCase):
              patch('content.publication.trainer_dto',side_effect=AssertionError('unneeded trainer content')):
             with CaptureQueriesContext(connection) as queries:
                 shell=public_shell()
-            self.assertEqual(shell,{'brand_name':'TEST SHELL BRAND','has_trainers':True})
+            self.assertEqual(shell,{'brand_name':'TEST SHELL BRAND','has_trainers':True,
+                                   'logo':None,'contact_path':f'/branches/#branch-{self.branch_row.pk}'})
             selects=[q['sql'] for q in queries if q['sql'].startswith('SELECT') and 'pg_advisory' not in q['sql']]
-            self.assertEqual(len(selects),2)
-            self.assertNotIn('wagtailimages', ' '.join(selects))
+            self.assertEqual(len(selects),3)
+            self.assertNotIn('wagtailimages_rendition', ' '.join(selects))
+            self.assertNotIn('content_branchphoto', ' '.join(selects))
+            self.assertNotIn('content_trainercareer', ' '.join(selects))
+            self.assertTrue(any('LIMIT 2' in sql and 'content_branch' in sql for sql in selects))
             self.assertNotIn('wagtailcore_revision', ' '.join(selects))
             self.assert_shell(self.anon.get('/posts/'),True)
             self.assert_shell(self.anon.get(self.article.get_absolute_url()),True)

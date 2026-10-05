@@ -1,0 +1,4 @@
+<a href="/"{% if page.section == 'home' %} aria-current="page"{% endif %}>홈</a>
+<a href="/branches/"{% if page.section == 'branches' %} aria-current="page"{% endif %}>지점 안내</a>
+{% if public_shell.has_trainers %}<a href="/trainers/"{% if page.section == 'trainers' %} aria-current="page"{% endif %}>트레이너 소개</a>{% endif %}
+<a href="/posts/"{% if page.section == 'posts' %} aria-current="page"{% endif %}>공지·이벤트</a>

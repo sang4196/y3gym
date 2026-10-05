@@ -127,13 +127,18 @@ class Post(DraftStateMixin, RevisionMixin, PreviewableMixin, models.Model):
     def serve_preview(self, request, mode_name):
         from .post_publication import post_dto
         from .publication import public_shell
+        from .presentation import page_meta, post_meta
         with content_transaction(read=True):
             shell = public_shell()
             try:
                 images = self.validate_content(user=request.user)
             except ValidationError:
-                return render(request, 'content/error.html', {'message': '참조 이미지와 본문을 확인하세요.', 'public_shell': shell}, status=400)
-            return render(request, 'content/post_detail.html', {'post': post_dto(self, images=images, preview=True), 'preview': True, 'public_shell': shell})
+                message = '참조 이미지와 본문을 확인하세요.'
+                return render(request, 'content/error.html', {'message': message, 'public_shell': shell,
+                              'page': page_meta(message, shell, noindex=True), 'status_code': 400}, status=400)
+            post = post_dto(self, images=images, preview=True)
+            return render(request, 'content/post_detail.html', {'post': post, 'preview': True, 'public_shell': shell,
+                          'page': post_meta(post, shell, preview=True)})
 
 
 class PostImageUse(models.Model):
