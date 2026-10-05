@@ -3,7 +3,7 @@ from wagtail.models import Collection, GroupCollectionPermission
 
 def configure_operator(user):
     group, _ = Group.objects.get_or_create(name='홈페이지 운영자')
-    wanted = Permission.objects.filter(content_type__app_label='content', codename__in=['add_sitecontent','change_sitecontent','view_sitecontent','add_branch','change_branch','view_branch','add_trainer','change_trainer','view_trainer','add_post','change_post','view_post','publish_post'])
+    wanted = Permission.objects.filter(content_type__app_label='content', codename__in=['add_sitecontent','change_sitecontent','view_sitecontent','add_branch','change_branch','view_branch','add_trainer','change_trainer','view_trainer','add_post','change_post','view_post','publish_post','add_popup','change_popup','view_popup'])
     group.permissions.add(*wanted, Permission.objects.get(content_type__app_label='wagtailadmin',codename='access_admin'))
     root = Collection.get_first_root_node()
     collection = root.get_children().filter(name='홈페이지 사진').first()

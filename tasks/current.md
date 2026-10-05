@@ -1,5 +1,28 @@
 # 현재 작업 — 제품 순차 개발
 
+## DEV-04 Git P2 후속 결과 — 재검토 인계, 쓰기 중지
+
+- 제목/문구/이미지 대체설명의 JS 길이를 서버와 같은 Unicode 코드 포인트 기준으로 수정했다. BMP/non-BMP 경계값 때문에 전체 후보 응답이 거부되던 결함이다. 한도200/1000/200과 실제 초과 응답 거부는 유지한다.
+- 관련 Node **16개/94.3442ms PASS**. 수정 전13 PASS/3 FAIL 재현 로그도 새 증거에 보존했다. 각 필드의 BMP·혼합·non-BMP 허용/초과 및 createController의 첫 정상 후보 표시를 검사했다. 서버 변경이 없어 PG68개는 이번 반복하지 않았고 실제 브라우저는 NOT_RUN이다.
+- 실행 중인 제품511334의 `/static/popups.js` 200 bytes가 수정 파일과 동일하다. 재시작 없이 적용했다. PG456028·SPIKE452717 유지, DB/콘텐츠/계정/암호/세션/미디어 변경 없음.
+- 후속 변경은 JS·Node 검사·[DEV-04 보고서 §8](../docs/verification/dev-04.md)·현재 기록 네 파일. 새 증거 `app/.runtime/dev-04-unicode-20261005T025757206979Z/`. 기존 변경/증거 보존, 최종 diff 점검 후 쓰기 중지 및 설계자 재인계. Git 쓰기·DEV-05 없음. 아래 결과는 이전 실행 이력이다.
+
+## 현재 배정: DEV-04 기간제 팝업
+
+- 2026-10-05 설계자 배정으로 DEV-04 시작. HEAD e54d34fa27f90800a9c4bd9bf693fa990849ff86와 clean 직접 확인. DEV-03 구현·서버 검사·Git 정상 push 완료, 실제 브라우저 NOT_RUN은 유지한다. 기존 PG46개/Node7개·P2 PG6개는 각각 실행 이력이다.
+- Q-01 모든 팝업 Post 필수 + v1 Post당 최대1개, 단일 현재값 저장·stale/PG 원자성·일반 운영자 add/change/view만 적용한다. 제목200/문구1000/alt200, 선택 이미지·비활성 기본, 활성 제목+문구 또는 이미지/시작·종료 필수, 비음수 우선순위. Post 공개 상태는 바꾸지 않는다.
+- 완료 조건: 서버 후보/API·시각 일관성·공개 Post 제목·팝업 이미지 SQL EXISTS, 정상 홈 비모달 안내/한 탭1회·닫기·KST 오늘숨김·서버시각 보정, 전용 PG/Node 관련·기존 회귀, additive migration·최소역할·로컬8766 적용/보존·문서화 후 쓰기중지 인계.
+- 사용자 콘텐츠/계정/암호/세션·SPIKE8765 전체 보존. 개발 Post/Popup 예시 생성·seed/초기화·Git 쓰기·상용 배포·DEV-05 동시착수 금지. 실제 브라우저/키보드/모바일은 별도 NOT_RUN이며 공식 도구 동일 오류를 재시도하지 않는다.
+
+## DEV-04 결과 — 구현·로컬 적용 완료, Git 검토 대기
+
+- 필수 Post OneToOne/PROTECT Popup·현재값 관리/활성필수·기간·stale/PG 원자성, 단일 서버시각 후보 API/공개 리비전 제목, 같은 조건의 이미지 SQL EXISTS를 구현했다. 정상 홈 비모달 안내·한 탭1회/닫기·KST ID별 오늘숨김·서버시각+monotonic 보정·bfcache 무효화를 적용했다.
+- 실제 전용 PostgreSQL **68개/45.162s PASS**(기존52+Popup16), 새 팝업 Node **13개/88.501501ms PASS**. 초기16개 검사에서 계산 property FieldPanel 오류5개를 HelpPanel로 수정한 뒤 전체 회귀를 통과했고 실패 로그도 보존했다. Node는 모의 상태/DOM이며 실제 브라우저/키보드/모바일은 **NOT_RUN**이다.
+- additive content.0004_popup·기존 운영자 add/change/view_popup3개만 적용. 권한삭제0, 계정/암호/세션·seed/migration자료이관 없음. 개발 Post/PostImageUse/Popup **0/0/0**. 새 의존성·운영서비스 없음.
+- 검증한 기존 제품508585만 종료→**현재 PID511334/127.0.0.1:8766** 유지. PG456028·SPIKE452717/8765 유지. 기존 콘텐츠/Post/참조/이미지 행·제품 미디어7개·SPIKE A1/19/B3/3/해당revision·미디어31개 전후 동일. 기존 JSON3개 meta 제외 동일·적용후 HTTP13건 기대상태/no-store 및 실제JS/CSS bytes 일치 PASS.
+- [DEV-04 보고서](../docs/verification/dev-04.md), 새 증거 `app/.runtime/dev-04-20261005T023850336094Z/`. Q-01 필수 연결/글당최대1·후보/표시/저장소 제한을 명세·ADR·안내에 한정 채택 기록했다. 전체 Proposed/상용배포 승격 없음, review-resolution/SPIKE 수정 없음.
+- 최종 변경·문서·diff 점검을 완료하고 **개발 쓰기를 중지했다**. 설계자에게 최소 수동 확인 묶음과 함께 인계한다. Git 담당자의 검토/commit/push는 아직 대기이며 DEV-05는 시작하지 않았다.
+
 ## DEV-03 Git P2 후속 수정 — 재인계, 쓰기 중지
 
 - Git 검토의 게시글 목록/상세 브랜드·트레이너 메뉴 누락을 수정했다. HTML 전용 public_shell은 브랜드명과 공개 지점+공개 프로필 EXISTS만 읽으며 사진/본문/약력 전체를 중복 생성하지 않는다. 기존 홈/지점/트레이너는 이미 조회한 결과에서 셸을 구성한다. Post/셸 DTO 완료까지 PG shared 경계를 유지하고 공개 API 필드는 그대로다.

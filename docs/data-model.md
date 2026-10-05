@@ -30,6 +30,14 @@ Post에 Wagtail DraftStateMixin/RevisionMixin/PreviewableMixin을 적용했다. 
 
 파생 PostImageUse(post, revision, image; post/image unique)는 실제 공개된 대표/본문 이미지 집합만 담는다. 공개/철회·시각·리비전·이 인덱스를 공통 PG exclusive lock 및 한 트랜잭션으로 변경하고, 공개 조회/DTO 변환은 동일 shared lock 안에서 완료한다. 표시본 권한은 SQL EXISTS에 live와 인덱스 revision_id=post.live_revision_id 조건을 함께 적용한다. 초안·과거 리비전을 인덱스에 넣거나 모든 Post 본문을 스캔하지 않는다. 기존 Site/Branch/Trainer 공개 사용처와 합쳐 마지막 참조가 없어지면 차단한다. 지원 경로/한계·원자성 검사는 [DEV-03 보고서](verification/dev-03.md)를 따른다.
 
+## DEV-04 적용 기록 — 2026-10-05
+
+Q-01의 Post 필수 연결과 설계자의 v1 글당 최대1개 선택을 Popup.post OneToOne/PROTECT로 적용했다. Popup은 리비전/초안/Preview 없이 현재 설정이며 title200/message1000/image_alt200, 선택 imageFK/PROTECT, enabled=false, nullable starts_at/ends_at, priority 비음수 기본0, 비공개 edit_version이다. 활성에는 제목·문구 또는 이미지·양쪽 기간이 필요하다. 비활성도 Post 및 양쪽 기간이 있으면 시작<종료를 요구한다. 공백을 정리하고 이미지 행/파일·운영자 컬렉션 선택권한을 확인한다. unique·유효기간·활성필수값·비음수의 DB 제약을 병행한다.
+
+단일 설정은 기존 PG exclusive lock/트랜잭션과 stale 토큰 안에서 전체 저장한다. 상태는 비활성→연결 글 비공개→예약→종료→노출가능 순으로 현재값/시각을 계산하며 배치가 갱신하는 중복 상태 컬럼은 없다. Popup 저장/비활성/만료는 Post 상태를 변경하지 않는다. 후보/DTO는 같은 shared lock 후 한 번 정한 now로 enabled·Post live/live_revision·시작<=now<종료를 검사한다. linked post title은 live_revision.content에서 읽는다.
+
+이미지는 같은 활성 후보 조건의 SQL EXISTS를 기존 공개 사용처와 OR 결합한다. 원본/관리자 썸네일은 계속 인증 필요, 팝업 만료/철회 후 새 표시본 요청은 다른 공개 사용처가 없을 때 차단한다. 조회 때마다 서버시각으로 결정하므로 scheduler·별도 서비스가 없다. [DEV-04 보고서](verification/dev-04.md)는 이 범위의 채택·지원 경로·실행 결과만 기록하며 전체 Proposed를 일괄 승격하지 않는다.
+
 ## 1. 문서의 지위와 범위
 
 `docs/screens.md`의 확정 제품 기준을 보존한다. 그 문서의 화면 배치·공개 정책 제안이 파일에 저장되었다는 이유만으로 모두 확정된 것으로 취급하지 않는다. 본 문서에서 새로 정의하는 필드명, 저장 방식, 제약, 삭제 정책은 기술 설계 제안이다.
@@ -68,7 +76,7 @@ Post에 Wagtail DraftStateMixin/RevisionMixin/PreviewableMixin을 적용했다. 
 
 Branch : Trainer = 1 : N (확정). Branch : BranchPhoto = 1 : N (제안). Trainer : TrainerCareer = 1 : N (제안).
 
-**Post : Popup = 1 : 0..1은 v1 단순화를 위한 추가 제안**이다. 게시글당 팝업 설정 하나를 재사용하는 안이며, 사용자가 최대 개수를 명시적으로 확정한 것은 아니다. Popup마다 게시글 하나가 반드시 있어야 한다. 지점과 Post/Popup 사이에는 관계를 추가하지 않는다.
+**Post : Popup = 1 : 0..1을 DEV-04 v1 기준으로 채택**했다. Q-01에서 사용자는 모든 팝업의 게시글 연결을 필수로 결정했고, 게시글당 최대1개 설정 재사용은 순차 승인 아래 설계자가 선택했다. 지점과 Post/Popup 사이에는 관계를 추가하지 않는다.
 
 ## 4. 공통 데이터 원칙
 
@@ -221,7 +229,7 @@ C-01 보정: 본문·이미지·팝업을 포함한 모든 공개 콘텐츠의 �
 | starts_at / ends_at | 시작·종료 일시 |
 | priority | 후보 정렬 기준. 작은 값 우선 제안 |
 
-v1 게시글당 설정 하나는 §3의 추가 제안이다. 팝업 작성·비활성 저장 시 미완성 기간을 허용할 수 있지만, 활성화 시 비어 있지 않은 제목, 문구 또는 이미지 중 최소 하나, 시작·종료를 모두 검증한다. 시작과 종료가 모두 있을 때는 항상 시작보다 종료가 늦어야 한다.
+v1 게시글당 설정 최대 하나는 §3 및 DEV-04의 채택 기준이다. 팝업 비활성 준비 시 Post 외 미완성을 허용하지만, 활성화 시 비어 있지 않은 제목, 문구 또는 이미지 중 최소 하나, 시작·종료를 모두 검증한다. 시작과 종료가 모두 있을 때는 항상 시작보다 종료가 늦어야 한다.
 
 P-01 Proposed: 팝업은 연결 글·문구·이미지 참조·기간·사용 여부를 함께 저장하는 현재 설정이다. 수정 초안이나 독립 공개본은 없으며 사용 중 저장도 이후 후보 조회에 반영된다. 게시글 수정 초안은 연결된 공개 게시글의 제목을 바꾸지 않는다.
 
@@ -291,7 +299,7 @@ Wagtail 공식 문서는 Headless 구성과 REST API 사용을 지원하지만, 
 | ID | 제안 또는 미정 |
 |---|---|
 | TD-01 | 실제 CMS·DB·버전 및 모델별 클래스 매핑은 ADR 대상 |
-| TD-02 | 게시글당 팝업 설정 0..1개로 제한하는 안 |
+| TD-02 | DEV-04에서 게시글당 팝업 설정0..1개 채택(Q-01은 Post 필수 연결 결정) |
 | TD-03 | 공개 전 필수 항목, 문자열 길이·이미지 규격 |
 | TD-04 | 본점 존재 보장·동시성 처리와 영구 삭제 정책 |
 | TD-05 | 게시글 최초 공개일 유지 및 공개본/수정초안 정책 |

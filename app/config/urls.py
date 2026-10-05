@@ -2,8 +2,9 @@ from django.urls import path, include
 from wagtail.admin import urls as admin_urls
 from wagtail.admin.auth import require_admin_access
 from content import views
-from content import post_views
+from content import post_views, popup_views
 urlpatterns = [
+    path('api/v1/popups/active/',popup_views.active,name='active-popups'),
     path('posts/',post_views.posts,name='posts'),
     path('posts/<int:pk>/',post_views.post_detail,name='post-detail'),
     path('api/v1/posts/',post_views.posts_api,name='posts-api'),

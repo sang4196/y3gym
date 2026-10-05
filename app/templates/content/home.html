@@ -1,7 +1,9 @@
-{% extends 'content/base.html' %}{% block content %}
+{% extends 'content/base.html' %}{% load static %}{% block content %}
 {% if site %}
 {% if site.logo %}<img class="logo" src="{{ site.logo.url }}" alt="{{ site.logo.alt }}" width="{{ site.logo.width }}" height="{{ site.logo.height }}">{% endif %}
-<h1>{{ site.hero_title|default:site.brand_name }}</h1>
+<h1 tabindex="-1" data-popup-return>{{ site.hero_title|default:site.brand_name }}</h1>
+<section class="home-popup" data-home-popup hidden aria-labelledby="home-popup-title" aria-live="polite" tabindex="0"></section>
+<script defer src="{% static 'popups.js' %}"></script>
 {% if site.hero_description %}<p class="text">{{ site.hero_description }}</p>{% endif %}
 {% if site.hero_image %}<img src="{{ site.hero_image.url }}" alt="{{ site.hero_image.alt }}" width="{{ site.hero_image.width }}" height="{{ site.hero_image.height }}">{% endif %}
 {% if branches %}<p><a href="/branches/">지점별 문의</a></p>{% endif %}

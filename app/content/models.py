@@ -246,3 +246,5 @@ from django import forms
 Branch.panels = [FieldPanel('edit_version', widget=forms.HiddenInput), MultiFieldPanel([FieldPanel(x) for x in ['name','is_public','is_main','replacement_main','sort_order']], heading='공개와 본점', help_text=SAVE_NOTICE), MultiFieldPanel([FieldPanel(x) for x in ['summary','cover_image','cover_alt','address','address_detail','phone','kakao_channel_url','business_hours','closed_days','parking_info','usage_notes']], heading='지점 안내', help_text='지도 연동은 준비 중입니다. 주소와 연락처는 표시됩니다.'), InlinePanel('photos', label='시설 사진')]
 
 from .post_models import Post, PostImageUse
+
+from .popup_models import Popup

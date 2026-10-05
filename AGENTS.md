@@ -50,3 +50,7 @@ DEV-01 완료 후 사용자가 “앞으로 진행할 작업들을 리스트화�
 순차 승인에 따라 Post/공개 리비전·초안/인증 Preview·과거 버전 초안복원, 공개 HTML/JSON·홈 최근3건과 관계형 PostImageUse를 구현했다. 실제 PG46개(기존28+Post18)·편집기 Node7개 PASS이며 실제 브라우저는 NOT_RUN이다. 결과는 `docs/verification/dev-03.md`. content.0003_posts·운영자 Post권한4개만 additive 적용했고 개발 Post는0건이다. 계정/암호/세션 save·시드·SPIKE 변경 없음. 제품 PID506850/127.0.0.1:8766으로 적용·유지했으며 이전 제품464276만 종료했다. PG456028/SPIKE452717 및 사용자 콘텐츠/미디어 보존 비교 PASS. Git 검토는 개발 쓰기 중지 후 별도 담당자에게 인계하며 DEV-04를 중복 착수하지 않는다.
 
 DEV-03 Git P2 후속: 게시글 공통 브랜드/트레이너 메뉴를 경량 public_shell로 복구하고 관련 PG6개/2.770s를 검사했다. Preview/오류도 공개 셸을 유지하며 DB장애만 최소 fallback이다. 결과는 보고서 §7. 이전 제품506850만 종료 후 현재 PID508585/127.0.0.1:8766 유지, 사용자 콘텐츠/권한/미디어와 PG/SPIKE 보존. 개발 쓰기 중지·Git 재검토 대기이며 DEV-04 미착수다.
+
+## DEV-04 구현·인계 기록 (2026-10-05)
+
+순차 승인 및 Q-01(모든 팝업 Post 필수)에 따라 v1 글당 최대1개 Popup/현재값 관리·기간 후보/API·SQL EXISTS 이미지 권한·정상 홈 비모달 안내/한 탭1회·KST 오늘숨김을 구현했다. 실제 PG68개(기존52+Popup16)/45.162s·새 Node13개 PASS, 실제 브라우저는 NOT_RUN이다. `docs/verification/dev-04.md` 참조. content.0004_popup와 기존 그룹 add/change/view_popup만 적용, dev Post/Popup0건·계정/암호/세션/seed 쓰기 없음. 기존 제품508585만 종료→현재 PID511334/127.0.0.1:8766 유지, PG456028/SPIKE452717·기존 콘텐츠/미디어 보존 비교 PASS. 쓰기 중지 후 Git 검토로 인계하며 DEV-05는 다음 설계자 배정 전 착수하지 않는다.

@@ -12,3 +12,6 @@ register_snippet(PostViewSet)
 def post_restore_is_draft_only(menu_items, request, context):
     if context.get('model') is Post and context.get('view') == 'revisions_revert':
         menu_items[:] = [item for item in menu_items if item.name != 'action-publish']
+
+from .admin import PopupViewSet
+register_snippet(PopupViewSet)

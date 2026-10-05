@@ -1,6 +1,6 @@
-# DEV-01~03 — 사이트·지점·트레이너·공지 관리
+# DEV-01~04 — 사이트·지점·트레이너·공지·팝업 관리
 
-승인된 제품 단위다. Django/Wagtail 관리자에서 사이트 소개, 지점·시설 사진·이용안내, 트레이너·약력을 저장한다. 공개 홈(`/`)·지점(`/branches/`)·트레이너(`/trainers/`)와 공개 JSON이 같은 조회를 사용한다. DEV-02는 지점과 프로필이 모두 공개일 때만 트레이너 섹션·링크·사진 표시본을 제공한다. 지도는 location=null이며 팝업/완성 디자인/상용 배포는 후속 단위다. DEV-03은 공지·이벤트의 수정 초안/공개 리비전/인증 Preview와 `/posts/`·상세/공개 JSON을 추가했다. 실행 결과는 [DEV-01](../docs/verification/dev-01.md), [DEV-02](../docs/verification/dev-02.md), [DEV-03 보고서](../docs/verification/dev-03.md)를 따른다.
+승인된 제품 단위다. Django/Wagtail 관리자에서 사이트 소개, 지점·시설 사진·이용안내, 트레이너·약력을 저장한다. 공개 홈(`/`)·지점(`/branches/`)·트레이너(`/trainers/`)와 공개 JSON이 같은 조회를 사용한다. DEV-02는 지점과 프로필이 모두 공개일 때만 트레이너 섹션·링크·사진 표시본을 제공한다. 지도는 location=null이며 완성 디자인/상용 배포는 후속 단위다. DEV-03은 공지·이벤트의 수정 초안/공개 리비전/인증 Preview와 `/posts/`·상세/공개 JSON을 추가했다. 실행 결과는 [DEV-01](../docs/verification/dev-01.md), [DEV-02](../docs/verification/dev-02.md), [DEV-03](../docs/verification/dev-03.md), [DEV-04 보고서](../docs/verification/dev-04.md)를 따른다.
 
 ## 환경과 분리
 
@@ -45,15 +45,17 @@ python3 scripts/local_pg.py start
 .venv/bin/python manage.py create_operator dev-editor
 ```
 
-이 명령은 기존 계정이면 암호를 변경하므로 사용자 의도 없이 재실행하지 않는다. 운영자는 Site/Branch/Trainer 추가·변경·조회, Post 추가·변경·조회·공개/철회 및 전용 이미지 컬렉션의 업로드·선택·변경만 가능하며 사용자/사이트 구조/페이지/문서 관리 권한이 없다. 약력은 트레이너 부모 안에서만 편집한다. 자산 영구 삭제는 직접 경로에서도 차단한다.
+이 명령은 기존 계정이면 암호를 변경하므로 사용자 의도 없이 재실행하지 않는다. 운영자는 Site/Branch/Trainer 추가·변경·조회, Post 추가·변경·조회·공개/철회, Popup 추가·변경·조회 및 전용 이미지 컬렉션의 업로드·선택·변경만 가능하며 사용자/사이트 구조/페이지/문서 관리 권한이 없다. 약력은 트레이너 부모 안에서만 편집한다. 자산 영구 삭제는 직접 경로에서도 차단한다.
 
-기존 환경에 DEV-02·03을 적용할 때는 아래 명령으로 테이블과 역할 권한만 추가한다. 현재 환경에는 이미 적용했다. 기존 Site/Branch/사진 행이나 사용자·암호·세션을 변경하지 않고, 기존 그룹 권한도 제거하지 않는다. 그룹이 없으면 자동 계정 생성 없이 오류를 반환한다.
+기존 환경에 DEV-02~04를 적용할 때는 아래 명령으로 테이블과 역할 권한만 추가한다. 현재 환경에는 이미 적용했다. 기존 Site/Branch/사진 행이나 사용자·암호·세션을 변경하지 않고, 기존 그룹 권한도 제거하지 않는다. 그룹이 없으면 자동 계정 생성 없이 오류를 반환한다.
 
 ```bash
 .venv/bin/python manage.py migrate --noinput
 .venv/bin/python manage.py extend_trainer_permissions
 # DEV-03 기존 운영자 그룹에 Post 권한4개만 추가(현재 적용 완료):
 .venv/bin/python manage.py extend_post_permissions
+# DEV-04 현재 환경 적용 완료: Popup add/change/view만 추가
+.venv/bin/python manage.py extend_popup_permissions
 ```
 
 초기 검증용 `DEV-01 TEST ONLY`, `TEST 본점`, `TEST 준비 지점`과 청록/주황/보라 합성PNG를 만들었다. 주소·전화는 **실제 정보가 아니므로 연락하지 않는다**. 합성 생성 명령 `create_dev_demo --confirm-test-data`는 Site/Branch가 있으면 중단하며, 사용자 편집 시작 뒤 재실행하지 않는다. 실사업 자료나 SPIKE 내용을 이관하지 않았다.
@@ -84,12 +86,23 @@ Post 자동저장·기존 리비전 덮어쓰기·수동 날짜·예약·workflo
 
 사진은 새 자산 업로드 후 선택하여 교체한다. 시설 사진의 배치 제거는 허용하되 원본 영구삭제와 다르다. 원본·내부 썸네일은 운영자 권한 경로, 공개 표시는 현재 Site/공개지점/시설배치/지점과 프로필 모두 공개인 트레이너 또는 Post 실제 공개 리비전 참조가 있는 경우에만 제공한다. 공유 사진은 한 공개 사용처라도 남으면 공개다.
 
+## 기간제 팝업
+
+모든 팝업은 게시글 하나에 필수 연결하며 글당 최대1개 설정을 재사용한다. 게시글에 팝업을 추가하는 것은 선택이다. 기존 Wagtail ‘기간제 팝업’에서 제목200/일반 문구1000/선택 이미지·alt200/사용/시작·종료(한국시간)/우선순위(작을수록 먼저)를 관리한다. 비활성 준비는 Post 외 미완성을 허용하되 양쪽 기간이 있으면 시작<종료여야 한다. 활성은 제목과 문구 또는 이미지 및 시작/종료가 필수다. 저장 즉시 현재 설정에 반영되지만 Post의 공개 상태/초안은 바꾸지 않는다. ‘연결 글 비공개로 중지’면 글의 공개 상태를 확인한다. 방문자별 숨김을 관리자 상태로 표시하지 않는다.
+
+`/api/v1/popups/active/`는 활성/기간/실제 공개 Post를 만족하는 후보만 서버시각으로 반환한다. 연결 글 제목은 공개 리비전이다. 팝업 이미지는 같은 조건의 SQL EXISTS로 판정하며 종료/비활성/글 철회 때 다른 공개 참조가 없으면 새 표시본 접근을 차단한다. 방문자 숨김은 이미지 권한과 별개다.
+
+준비된 홈에만 비모달 안내를 자동 표시한다. 서버 순서에서 오늘숨김 아닌 첫 유효 후보1개를 실제 표시한 뒤 탭의 표시완료를 기록한다. 닫은 직후 다음 안내는 띄우지 않는다. 오늘숨김은 ID별 한국 다음날00:00까지이며 문구 수정으로 초기화되지 않는다. 저장소가 막히면 현재 문서 안의 닫기/1회는 유지되나 새 문서/탭의 기억은 보장하지 않는다. 서버시각과 monotonic 경과로 벽시계 오차를 보정하고 bfcache/오래된 응답을 재사용하지 않는다. 상시 polling·실시간 원격 회수는 없다. JS/네트워크 실패에도 홈 본문은 유지한다.
+
+개발 DB에 Popup/Post 예시는 생성하지 않았다. 실제 브라우저/키보드/모바일은 NOT_RUN이며 수동 확인 계획과 저장소 제한은 DEV-04 보고서를 따른다.
+
 ## 검증
 
 ```bash
 .venv/bin/python manage.py test content --settings=config.settings.test --noinput -v 2
 .venv/bin/python manage.py makemigrations --check --dry-run
 node --test tests/composer*.test.cjs
+node --test tests/popups.test.cjs
 uv --no-config --cache-dir .cache pip check --python .venv/bin/python
 ```
 
@@ -102,6 +115,8 @@ DEV-02도 같은 잠금 경계에서 Trainer+Career 저장·조회 전체를 처
 DEV-03은 실제 PG46개(기존28+Post18)와 편집기 Node7개 PASS다. PG 검사는 공개/철회·복원·시각·필터/페이지·권한/파일·인덱스 실패 rollback·동시성, Node는 모의 계약1개와 실제 설치 라이브러리 상태 전이6개다. 브라우저 클릭/화면/포커스 검증은 NOT_RUN이다. `PostImageUse`는 공개 대표/본문 참조의 파생 관계 인덱스이며 실제 live_revision과 일치할 때만 공개 권한에 포함한다. 전체 공개 Post를 읽는 스캔은 없다. 기본 action 직접 호출·raw SQL/임의 bulk update·인덱스 수동 변경은 지원 편집 경로가 아니다.
 
 Git P2 후속에서 게시글/Preview/공개 오류 화면의 공통 브랜드·트레이너 메뉴를 복구했다. 셸은 브랜드명과 공개 지점의 공개 트레이너 존재만 조회하고 기존 홈/지점/트레이너는 이미 읽은 결과를 재사용한다. DB 자체 장애 때만 최소 오류 셸로 표시한다. 관련 PG6개 PASS와 제품 PID508585/8766 재적용·보존 근거는 DEV-03 보고서 §7을 따른다. 전체 검토는 재개 대기이며 실제 브라우저는 NOT_RUN이다.
+
+DEV-04 실제 PG68개(기존52+팝업16)/45.162s 및 최초 팝업 Node13개 PASS. Unicode 길이 수정 후 Node16개 PASS는 DEV-04 보고서 §8의 별도 후속 실행 결과다. 기존 공통 이미지·운영자·홈 변경에 따른 회귀를 함께 검사했다. 계산 상태 FieldPanel 오류는 HelpPanel로 수정하고 초기 실패 로그를 보존했다. 현재 제품 PID511334/127.0.0.1:8766, PG456028·SPIKE452717 유지. 원본 데이터/미디어 보존과 적용 후 HTTP13건은 보고서에 기록했다.
 
 ## 종료·보존
 

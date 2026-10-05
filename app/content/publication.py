@@ -1,5 +1,6 @@
 """Shared public projection. No sessions, revisions, raw storage URLs or O(n) asset scans."""
 from django.conf import settings
+from django.utils import timezone
 from django.db.models import Q, Exists, OuterRef, Prefetch, F
 from wagtail.images import get_image_model
 from .models import SiteContent, Branch, BranchPhoto, Trainer, TrainerCareer, PostImageUse
@@ -15,12 +16,16 @@ def public_shell():
         return {'brand_name': brand or '', 'has_trainers': has_trainers}
 
 def public_images():
+    from .popup_publication import active_popups
+    # Callers hold the shared content lock before this request-time decision.
+    now = timezone.now()
+    popups = active_popups(now).filter(image_id=OuterRef('pk'))
     site = SiteContent.objects.exclude(brand_name='').filter(Q(logo_id=OuterRef('pk'))|Q(hero_image_id=OuterRef('pk'))|Q(introduction_image_id=OuterRef('pk')))
     branches = Branch.objects.filter(is_public=True, cover_image_id=OuterRef('pk'))
     photos = BranchPhoto.objects.filter(branch__is_public=True, image_id=OuterRef('pk'))
     trainers = Trainer.objects.filter(is_public=True, branch__is_public=True, profile_image_id=OuterRef('pk'))
     posts = PostImageUse.objects.filter(post__live=True, revision_id=F('post__live_revision_id'), image_id=OuterRef('pk'))
-    return get_image_model().objects.alias(site_use=Exists(site), branch_use=Exists(branches), photo_use=Exists(photos), trainer_use=Exists(trainers), post_use=Exists(posts)).filter(Q(site_use=True)|Q(branch_use=True)|Q(photo_use=True)|Q(trainer_use=True)|Q(post_use=True))
+    return get_image_model().objects.alias(site_use=Exists(site), branch_use=Exists(branches), photo_use=Exists(photos), trainer_use=Exists(trainers), post_use=Exists(posts), popup_use=Exists(popups)).filter(Q(site_use=True)|Q(branch_use=True)|Q(photo_use=True)|Q(trainer_use=True)|Q(post_use=True)|Q(popup_use=True))
 
 def image_dto(image, alt=''):
     if image is None: return None

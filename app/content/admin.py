@@ -53,3 +53,15 @@ class TrainerViewSet(ContentViewSet):
     list_display = ['name', 'branch', 'job_title', 'is_public', 'sort_order']
     list_filter = ['branch', 'is_public']
     search_fields = ['name', 'job_title']
+
+from .models import Popup
+Popup.base_form_class = ContentForm
+
+class PopupViewSet(ContentViewSet):
+    model = Popup
+    menu_label = '기간제 팝업'
+    icon = 'doc-full'
+    list_display = ['title', 'post', 'enabled', 'display_status', 'starts_at', 'ends_at', 'priority']
+    list_filter = ['enabled']
+    search_fields = ['title', 'message']
+    copy_view_enabled = False

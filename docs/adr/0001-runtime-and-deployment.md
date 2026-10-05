@@ -19,6 +19,10 @@ Django5.2.17·Wagtail7.4.3 LTS·Pillow12.3.0·psycopg[binary]3.3.6을 Python3.14
 
 순차 개발 승인과 설계 지시로 기존 제품 Django/Wagtail/PG18.6/초기 템플릿을 Post에 적용했다. 제품 venv에 SPIKE와 동일한 bleach6.4.0 및 전이 webencodings0.6.1만 해시 잠금 추가했고 기존 패키지 버전은 변경하지 않았다. 신규 서비스/시스템 설정 없이 별도 test DB/미디어에서 실제 PostgreSQL46개(기존28+Post18)와 Node7개를 검사했다. Node 검사는 모의 계약·설치 라이브러리 상태 전이이며 브라우저가 아니다. [DEV-03 보고서](../verification/dev-03.md)에 적용/보존 근거를 기록한다. 전체 A-01/상용 Linux·배포·복원·성능을 승격하지 않는다.
 
+## DEV-04 한정 적용 기록 — 2026-10-05
+
+순차 승인 범위의 Popup은 기존 WSL Linux venv/PG18.6/템플릿·vanilla JS로 구현했다. 신규 의존성/운영 서비스/스케줄러 없이 content.0004_popup 테이블·제약과 일반 운영자의 Popup add/change/view만 additive 적용한다. 현재시각 후보/SQL EXISTS 이미지 판정과 PG 공통 잠금을 유지한다. 실제 PG68개(기존52+팝업16), 새 Node13개와 루프백 적용의 계층별 결과는 [DEV-04 보고서](../verification/dev-04.md). 실제 브라우저·상용 서버/배포·대량성능은 미검증이며 전체 ADR은 Proposed를 유지한다.
+
 ## 1. 배경
 
 현재 조건(2026-09-18 SPIKE-01 갱신)은 Windows 호스트 위 WSL Ubuntu 개발, 향후 별도 Linux 상용 서버 배포, 이후 고객 프론트 분리다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python·셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS / WSL2 커널 / Python 3.14.4 / ext4 저장소다. Windows 제품·버전, WSL 패키지 버전, 운영 Linux 배포판·버전·호스팅·실행 방식은 TBD다. `review-resolution.md`의 Windows 중심 설명은 원문 기록으로 보존한다.

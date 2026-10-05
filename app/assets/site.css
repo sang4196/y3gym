@@ -15,3 +15,11 @@ footer { padding-block: 2rem; }
 .trainer-section { scroll-margin-top: 1rem; padding-block: 1rem; }
 .trainer-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,18rem),1fr)); gap: 2rem; }
 .trainer-cards img { display: block; max-height: 24rem; object-fit: contain; }
+
+.home-popup {max-width:34rem;max-height:min(28rem,65svh);overflow:auto;box-sizing:border-box;margin:1rem 0;padding:1rem;border:2px solid #586874;border-radius:.5rem;background:#f4f7f8;overflow-wrap:anywhere;}
+.home-popup[hidden] {display:none;}
+.home-popup h2 {margin-top:0;}
+.home-popup p {white-space:pre-line;}
+.home-popup img {display:block;max-height:10rem;width:auto;max-width:100%;object-fit:contain;}
+.home-popup button,.home-popup a {display:inline-block;margin:.5rem .5rem 0 0;min-height:2.75rem;padding:.5rem;}
+.home-popup :focus-visible {outline:3px solid #174b8b;outline-offset:2px;}
