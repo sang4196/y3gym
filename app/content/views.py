@@ -41,6 +41,15 @@ def home(request):
 def branches(request):
     return render(request,'content/branches.html',public_snapshot())
 
+@require_safe
+def trainers(request):
+    return render(request, 'content/trainers.html', public_snapshot())
+
+@require_safe
+def trainer_sections_api(request):
+    if request.GET: return error('INVALID_QUERY','지원하지 않는 조회 조건입니다.',400)
+    return JsonResponse({'items':public_snapshot()['trainer_sections'],'meta':meta()})
+
 def file_response(field):
     try: stream=field.open('rb')
     except FileNotFoundError as error: raise Http404 from error

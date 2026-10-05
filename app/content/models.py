@@ -158,6 +158,89 @@ class BranchPhoto(Orderable):
         strip_text(self)
         if self.image_id: check_image(self.image)
 
+
+class Trainer(ClusterableModel):
+    branch = models.ForeignKey(Branch, verbose_name='소속 지점', related_name='trainers', on_delete=models.PROTECT)
+    name = models.CharField('이름', max_length=100, blank=True)
+    edit_version = models.PositiveIntegerField(default=0)
+    job_title = models.CharField('직급', max_length=100, blank=True, help_text='선택 입력입니다. 표시 순서나 권한에 영향을 주지 않습니다.')
+    profile_image = image_field('프로필 사진', 'trainer_profiles')
+    profile_alt = models.CharField('프로필 사진 대체 설명', max_length=200, blank=True)
+    short_intro = models.CharField('한줄소개', max_length=300, blank=True)
+    is_public = models.BooleanField('공개', default=False, help_text='소속 지점도 공개일 때 표시됩니다. 비공개로 바꾸면 기존 소개도 고객 화면에서 사라집니다.')
+    sort_order = models.PositiveIntegerField('지점 내 표시 순서', default=0)
+
+    panels = [
+        FieldPanel('edit_version', widget=forms.HiddenInput),
+        MultiFieldPanel([FieldPanel(x) for x in ['branch', 'name', 'job_title', 'profile_image', 'profile_alt', 'short_intro', 'is_public', 'sort_order']], heading='트레이너 소개', help_text=SAVE_NOTICE),
+        InlinePanel('careers', label='약력'),
+    ]
+
+    class Meta:
+        ordering = ['sort_order', 'id']
+        verbose_name = '트레이너'
+        verbose_name_plural = '트레이너'
+        constraints = [models.CheckConstraint(
+            condition=Q(is_public=False) | (Q(profile_image__isnull=False) & ~Q(name='') & ~Q(short_intro='')),
+            name='public_trainer_required_fields',
+        )]
+
+    def __str__(self):
+        return self.name or f'비공개 준비 트레이너 {self.pk or ""}'
+
+    def clean(self):
+        strip_text(self)
+        if self.is_public:
+            errors = {}
+            for field, label in [('name', '이름'), ('branch_id', '소속 지점'), ('profile_image_id', '프로필 사진'), ('short_intro', '한줄소개')]:
+                if not getattr(self, field):
+                    errors[field.removesuffix('_id')] = f'공개하려면 {label} 항목이 필요합니다.'
+            if errors:
+                raise ValidationError(errors)
+        check_image(self.profile_image)
+
+    def save(self, *args, **kwargs):
+        if kwargs.get('update_fields') is not None:
+            raise ValidationError('콘텐츠는 부모 편집 단위 전체로 저장해야 합니다.')
+        with content_transaction():
+            current = type(self).objects.filter(pk=self.pk).first() if self.pk else None
+            if current and current.edit_version != self.edit_version:
+                raise ValidationError('다른 저장이 먼저 반영되었습니다. 다시 열어 확인하세요.')
+            self.full_clean()
+            for career in self.careers.all():
+                if career.pk and TrainerCareer.objects.filter(pk=career.pk).exclude(trainer_id=self.pk).exists():
+                    raise ValidationError('다른 트레이너의 약력을 수정할 수 없습니다.')
+                career.full_clean(exclude=['trainer'])
+            self.edit_version += 1
+            return super().save(*args, **kwargs)
+
+
+class TrainerCareer(Orderable):
+    class Category(models.TextChoices):
+        EDUCATION = 'education', '학력'
+        AWARD = 'award', '수상경력'
+        CERTIFICATION = 'certification', '자격증'
+        EXPERIENCE = 'experience', '주요 경력'
+
+    trainer = ParentalKey(Trainer, related_name='careers', on_delete=models.CASCADE)
+    category = models.CharField('구분', max_length=20, choices=Category.choices)
+    text = models.CharField('약력 내용', max_length=500)
+    panels = [FieldPanel('category'), FieldPanel('text')]
+
+    class Meta(Orderable.Meta):
+        ordering = ['sort_order', 'id']
+        verbose_name = '약력'
+        verbose_name_plural = '약력'
+        constraints = [
+            models.CheckConstraint(condition=Q(category__in=['education', 'award', 'certification', 'experience']), name='trainer_career_fixed_category'),
+            models.CheckConstraint(condition=~Q(text=''), name='trainer_career_nonempty_text'),
+        ]
+
+    def clean(self):
+        strip_text(self)
+        if not self.text:
+            raise ValidationError({'text': '약력 내용을 입력하거나 빈 항목을 제거하세요.'})
+
 # Forms are imported lazily by Wagtail after app initialization.
 from django import forms
 Branch.panels = [FieldPanel('edit_version', widget=forms.HiddenInput), MultiFieldPanel([FieldPanel(x) for x in ['name','is_public','is_main','replacement_main','sort_order']], heading='공개와 본점', help_text=SAVE_NOTICE), MultiFieldPanel([FieldPanel(x) for x in ['summary','cover_image','cover_alt','address','address_detail','phone','kakao_channel_url','business_hours','closed_days','parking_info','usage_notes']], heading='지점 안내', help_text='지도 연동은 준비 중입니다. 주소와 연락처는 표시됩니다.'), InlinePanel('photos', label='시설 사진')]

@@ -2,6 +2,8 @@
 
 실행·확인일: **2026-09-18**. 범위: `experiments/cms-spike`의 Post 하나와 CMS 이미지, WSL Ubuntu, 로컬 SQLite·파일 저장소.
 
+**최신 후속 점검(2026-10-05 KST, §25):** 사용자 요청에 따라 공식 Computer Use 초기화를 한 번 재시도했으나 동일 URI 오류로 BLOCKED다. 이번 실제 브라우저 동작은 모두 NOT_RUN이며 이전 사용자 보고 PASS와 서버 결과는 유지한다. 읽기 전용 현재값은 A 공개1/초안19·B3/3, 일반 운영자 local-editor, 합성 PNG4개·미디어31개, 기존 루프백 서버 PID452717이다. 새 서버·계정·초안·업로드·HTTP 대체 검증은 없다. 아래 제품/PG 미준비 표현은 과거 SPIKE 시점 기록이며 현재 별도 제품 진행 기록을 덮어쓰지 않는다. 이번 SPIKE 요청으로 정책을 승인하거나 제품 구현을 진행하지 않았다.
+
 **현재 상태(2026-10-05 KST):** Paragraph 기본 편집·이미지1 파일 교체 입력 비활성 표시 및 SP-11 별도 JS 소비자의 A 정상 표시를 사용자 보고로 확인했다(§22~24). 에이전트 직접 화면 관찰·캡처는 없다. 새 소비자 관련 서버5개/모의DOM JS3개 PASS, 적용 전후 공개 HTML/JSON·A공개1/최신19·B3/3·해당 리비전/미디어 해시 유지(§24). 자동 브라우저 도구 BLOCKED; JS404/오류·보호 URL 브라우저 대조 등 미검증은 별도다. 새 서버 PID452717은 사용자 확인용으로 유지한다. PG는 환경 미준비, DEV-01은 계획이며 정책·ADR은 Proposed다.
 
 후속 브라우저 검증(2026-09-18): **자동화 도구 BLOCKED / 수동 일부 확인(사용자 보고)**. 아래 §1~9는 이전 서버 검증 기록이며 이번 재실행 결과가 아니다. 도구 진단은 §10~11, 최신 수동 관찰 결과는 §13을 따른다.
@@ -662,3 +664,52 @@ DB 연결·인증정보 조회·타 프로젝트 인스턴스 사용·서비스 
 따라서 별도 JS 소비자가 공개 JSON을 받은 후 A의 위 정상 콘텐츠·굵은 서식·링크 텍스트·대표/본문 이미지를 표시한 범위는 **PASS(사용자 보고)**다. 위 NOT_RUN/대기는 이 보고 이전 시점이다. 에이전트 직접 관찰·캡처는 없고, 이전 Codex 내장 브라우저 보고를 참고하되 이번 새 탭의 제품/버전·독립 비로그인 세션은 추가 확인하지 않았다. 공개본에 없는 Italic 표시, 링크 실제 이동,404/네트워크·이미지 실패의 브라우저 표시, 모든 상태를 합친 SP-11 전체 PASS는 주장하지 않는다. 오류 분기는 앞선 서버/모의DOM 검사와 구분한다. 입력/저장 요청이 아니며 이번 보고 후 DB 재조회나 변경 추정은 없다.
 
 DEV-01 및 WSL 전용 PostgreSQL 준비 승인 질문은 설계자가 사용자에게 전달한 상태이며 아직 답변이 없다. 제품 구현·설치·정책 승격은 수행하지 않았다. 최종 문서/diff 점검 후 변경을 멈추고 설계자에게 일괄 Git 검토 인계를 요청한다. 이 작업에서 staging/commit/push는 수행하지 않는다.
+
+## 25. 요청된 브라우저 후속 점검 — 2026-10-05 KST
+
+### 현재 환경·자료 확인
+
+적용 상위/하위 지침과 루트 AGENTS.md, README, 세 명세, review-resolution, 두 ADR, 실험 안내·이 보고서·tasks/current.md를 확인했다. 현재 저장소에는 별도 DEV-01 구현 및 DEV-02 진행 기록이 있지만 이번 작업은 사용자가 요청한 SPIKE 브라우저 검증으로 한정했다. 기존 정책 기록을 되돌리거나 전체 Proposed를 Accepted로 바꾸지 않는다.
+
+시작 HEAD `9df2f686c3634f006352e1942cea7b15653384bc`; AGENTS.md·README.md·tasks/current.md 수정 및 tasks/roadmap.md 미추적 상태, staged diff 없음. 기존 변경을 보존하고 작업 기록에는 이 후속 절만 추가했다. cwd와 Git 루트는 `/home/shlee/Workspace/ai/01.codex/y3gym`, ext4, Ubuntu 26.04.1 LTS, 커널 `6.18.40.1-microsoft-standard-WSL2`, Bash, 기존 Linux venv Python3.14.4/Django5.2.17/Wagtail7.4.3/Pillow12.3.0을 재확인했다. 설치·마이그레이션·기존 성공 테스트를 반복하지 않았다.
+
+SQLite `mode=ro`의 제한된 SELECT 결과:
+
+| 대상 | 현재 확인값 |
+|---|---|
+| A 공개본 | live=true, 리비전1, SPIKE PUBLIC A, 대표1·본문2 |
+| A 최신 초안 | 리비전19, SPIKE DRAFT A TEST-DRAFT-01, 대표6·본문3 |
+| B 공개/최신 | 리비전3/3, 대표 없음·본문2 |
+| 일반 운영자 | local-editor: active/staff=true, superuser=false, SPIKE-01 content editor 그룹 |
+| 합성 자료 | PNG fixture4개, 이미지 자산7개, private-media 파일31개 |
+| 기존 서버 | PID452717, uid1000, 실험 cwd, README의 runserver 명령, 127.0.0.1:8765만 리스닝 |
+
+계정 암호·해시·세션·비밀값은 조회하지 않았다. 실제 로그인/세부 권한 행사는 이번에 미확인이다. 기존 계정이 있으므로 create_spike_editor를 실행하거나 비밀번호를 바꾸지 않았다. 새 서버를 시작하지 않았고 기존 서버를 종료하지 않았다.
+
+### 공식 도구 장애와 계층별 결과
+
+Computer Use 스킬 `26.924.22138`의 SKILL.md를 읽고 제공된 `mcp__node_repl__js`에서 공식 `@oai/sky` 초기화를 한 번 호출했다. 결과는 다음과 같다.
+
+```text
+Mcp error: -32602: js: codex/sandbox-state-meta: sandboxCwd is not a local file URI: file:///home/shlee/Workspace/ai/01.codex/y3gym
+```
+
+브라우저 선택·창 조회·로그인·클릭·캡처 전 실패다. 이번 실제 브라우저 제품/버전과 Windows→WSL 접속은 확인하지 못했다. open_in_codex의 탭 표시 기능은 조작·관찰 대체로 사용하지 않았다. 도구 장애이며 Wagtail 기능 FAIL의 증거는 아니다. 비공식 도구·작업 경로 이동·설치·설정 변경·인증 우회 없이 중단했다.
+
+| 항목 | 기존 증거 | 이번 결과 |
+|---|---|---|
+| SP-01 관리자 편집·chooser·업로드·Save draft·재열기 | 서버 PASS 및 §23의 한정 사용자 보고 PASS 유지 | 직접 브라우저 BLOCKED, 각 동작 NOT_RUN |
+| SP-05 최신 초안 Preview·인증/방문자 대조 | 서버 PASS, 사용자 서식·링크·이미지 Preview 보고 유지 | 직접 브라우저 BLOCKED, Preview·보호 이미지 대조 NOT_RUN |
+| SP-11 공개 표현·별도 JS 소비 | 서버/모의DOM PASS 및 §24 A 정상 JS 표시 사용자 보고 PASS 유지 | 이번 HTML/JSON/JS 브라우저 검사 NOT_RUN; 전체 SP-11 PASS 아님 |
+| 새 초안 저장 후 공개본 유지 | 이전 서버·HTTP/DB·사용자 시크릿 HTML 근거 유지 | 새 저장 없음, 이번 전후 비교 NOT_RUN |
+| 새 자산 비공개·원본/썸네일 무권한 접근 | 이전 서버/HTTP 결과 유지 | 이번 업로드/선택/방문자 브라우저 접근 NOT_RUN |
+
+공개 리비전·이미지 참조의 현재 DB 기준만 기록했다. 브라우저가 막혔으므로 공개 HTML/JSON 응답 기준 수집·서버 요청으로 대체 검증을 진행하지 않았다. 재개 시 실제 편집 직전에 공개 응답과 리비전을 함께 새 기준으로 수집해야 한다. Publish/Unpublish는 실행하지 않았다. 제품 결함 발견·코드 수정·회귀 테스트·새 화면 증거는 없다.
+
+### 증거·보존·다음 작업
+
+신규 Git 제외 증거: `experiments/cms-spike/.runtime/browser-followup-20261004T182501151727Z/`의 `preflight.json`(환경/Git/선택 DB 참조/미디어·fixture 해시/기존 서버), `computer-use-error.txt`(공식 호출·오류), `preservation.json`(종료 시 제한된 보존 비교). UTC 폴더 시각은 KST 10/05다. 오류 텍스트는 스크린샷이 아니며 암호·세션·비밀값을 저장하지 않았다. 기존 로그와 증거는 덮어쓰지 않았다.
+
+변경 문서는 이 보고서와 tasks/current.md뿐이다. DB·미디어·venv 초기화/삭제·seed·계정 변경·콘텐츠 쓰기·Git staging/commit/push는 없다. 이번 시작 서버가 없어 종료 대상도 없으며 이전부터 실행 중인 PID452717은 유지했다.
+
+필요한 사용자 조치는 공식 Computer Use의 WSL 작업 경로 초기화 장애를 지원 담당자에게 전달해 복구하는 것이다. 내부 원인·특정 설정 변경이 해결책이라고 단정하지 않는다. 기존 지원 문의 초안과 이번 오류 증거를 사용할 수 있다. 복구 후 기존 일반 운영자로 직접 로그인하고 남은 보호 URL 인증/비로그인 대조·공개 JSON·최신 저장 후 공개본 비교를 우선 재개한다. 이미 확인된 기본 편집은 사용자 보고와 직접 관찰 요구를 구분하여 불필요하게 반복하지 않는다. PostgreSQL·상용 Linux 배포·전체 제품 기능·정책 최종 승인은 이번 SPIKE 결과로 검증/승인하지 않는다.

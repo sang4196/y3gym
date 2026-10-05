@@ -11,6 +11,10 @@
 
 Django5.2.17·Wagtail7.4.3 LTS·Pillow12.3.0·psycopg[binary]3.3.6을 Python3.14.4의 별도 Linux venv에 설치·해시 잠금했다. 공식 지원 교집합 재확인과 실제 PG18.6/libpq18.6 실행 근거는 [DEV-01 보고서](../verification/dev-01.md)와 [앱 안내](../../app/README.md)에 기록한다. 특정 상용 Linux/운영 서버/HTTPS/복구 완료로 확대하지 않는다. 아래 ENV 전체 ‘미실행’ 표는 최초 계획이며 DEV-01의 Site/Branch 부분 실측 결과만 별도 보고서에서 갱신한다.
 
+## DEV-02 한정 적용 기록 — 2026-10-05
+
+남은 제품 순차 개발 승인에 따라 DEV-01의 고정 Django/Wagtail/PostgreSQL·초기 템플릿/공통 조회를 Trainer/Career에도 적용했다. 같은 제품 venv와 PG18.6 전용 소켓 클러스터를 재사용하고 신규 의존성·시스템 설정 변경 없이 additive migration을 적용했다. 전용 test DB의28개 검사 중 신규14개는 Trainer 저장·권한·미디어와 별도 연결 동시성이다. ENV-04의 이 범위 부분 실행이며 전체 ENV/상용 배포/성능·복원 검증은 아니다. [DEV-02 보고서](../verification/dev-02.md)에 실제 계층과 미검증을 구분한다.
+
 ## 1. 배경
 
 현재 조건(2026-09-18 SPIKE-01 갱신)은 Windows 호스트 위 WSL Ubuntu 개발, 향후 별도 Linux 상용 서버 배포, 이후 고객 프론트 분리다. Windows는 편집·브라우저 접근 환경이며 개발 실행·가상환경·테스트는 WSL의 Linux Python·셸을 사용한다. 직접 확인한 환경은 Ubuntu 26.04.1 LTS / WSL2 커널 / Python 3.14.4 / ext4 저장소다. Windows 제품·버전, WSL 패키지 버전, 운영 Linux 배포판·버전·호스팅·실행 방식은 TBD다. `review-resolution.md`의 Windows 중심 설명은 원문 기록으로 보존한다.

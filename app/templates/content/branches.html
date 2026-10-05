@@ -11,4 +11,5 @@
 {% if branch.parking_info %}<h3>주차 안내</h3><p class="text">{{ branch.parking_info }}</p>{% endif %}
 {% if branch.usage_notes %}<h3>이용안내</h3><p class="text">{{ branch.usage_notes }}</p>{% endif %}
 {% if branch.facility_photos %}<h3>시설 사진</h3><div class="photos">{% for photo in branch.facility_photos %}<figure><img src="{{ photo.image.url }}" alt="{{ photo.image.alt }}" width="{{ photo.image.width }}" height="{{ photo.image.height }}">{% if photo.caption %}<figcaption>{{ photo.caption }}</figcaption>{% endif %}</figure>{% endfor %}</div>{% endif %}
+{% if branch.trainer_section_path %}<p><a href="{{ branch.trainer_section_path }}">이 지점 트레이너 보기</a></p>{% endif %}
 </article>{% empty %}<p>공개된 지점이 없습니다.</p>{% endfor %}{% endblock %}

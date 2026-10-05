@@ -15,6 +15,12 @@
 
 location=null, trainer_section_path=null이며 나머지 엔드포인트/지도·트레이너/제품Post·Popup은 미구현이다. 초기 HTML과 JSON은 같은 materialized 공개 projection을 사용하며 PG shared lock을 다중 쿼리·변환 전체에 유지한다. 실제 부분 검증은 [DEV-01 보고서](verification/dev-01.md)를 따른다. 이 기록은 아래 전체 API 계획의 일괄 PASS/승인이 아니다.
 
+## DEV-02 적용 기록 — 2026-10-05
+
+`/api/v1/trainer-sections/`와 `/trainers/`가 §4.3의 동일 공개 projection을 사용한다. 지점·프로필 모두 공개인 카드만 포함하고 빈 섹션/분류는 생략한다. 선택 직급은 null, 약력이 없으면 []이며 프로필 사진은 공개 시 필수다. BranchDTO.trainer_section_path는 실제 공개 프로필이 있는 지점에만 `/trainers/#branch-{id}`를 반환한다. BranchSummaryDTO.page_path는 `/branches/#branch-{id}`다. DEV-01의 trainer_section_path=null 고정 설명은 당시 미구현 이력이다; 지도 location=null은 유지한다.
+
+빈 목록200, 미지원 질의400 INVALID_QUERY, 쓰기405 METHOD_NOT_ALLOWED, 문자열ID와 meta.server_time, 관리자 세션으로 공개 범위가 늘어나지 않는 규칙을 적용했다. 부모·약력·지점 연결과 DTO/이미지 변환까지 PG shared lock으로 함께 읽는다. 검사 계층·실제 브라우저 미실행은 [DEV-02 보고서](verification/dev-02.md)에 기록했다. 나머지 API·Popup/지도 등은 후속 범위다.
+
 ## 1. API의 경계
 
 고객에게 이미 공개하기로 한 콘텐츠의 **조회 전용** API다. 회원가입, 고객 로그인, 예약·결제, PT 관리, 트레이너 업무 계정, 관리자용 공개 CRUD API는 추가하지 않는다.

@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from wagtail.snippets.views.snippets import CreateView, EditView, SnippetViewSet
 from wagtail.permission_policies.base import ModelPermissionPolicy
-from .models import Branch, SiteContent
+from .models import Branch, SiteContent, Trainer
 from .forms import BranchForm, ContentForm
 
 class NoDeletePolicy(ModelPermissionPolicy):
@@ -35,6 +35,7 @@ class ContentViewSet(SnippetViewSet):
 
 SiteContent.base_form_class = ContentForm
 Branch.base_form_class = BranchForm
+Trainer.base_form_class = ContentForm
 class SiteViewSet(ContentViewSet):
     model = SiteContent
     menu_label = '홈페이지 기본 정보'
@@ -44,3 +45,11 @@ class BranchViewSet(ContentViewSet):
     menu_label = '지점'
     icon = 'site'
     list_display = ['name','is_public','is_main','sort_order']
+
+class TrainerViewSet(ContentViewSet):
+    model = Trainer
+    menu_label = '트레이너'
+    icon = 'user'
+    list_display = ['name', 'branch', 'job_title', 'is_public', 'sort_order']
+    list_filter = ['branch', 'is_public']
+    search_fields = ['name', 'job_title']

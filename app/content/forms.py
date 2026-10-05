@@ -26,7 +26,7 @@ class ContentForm(WagtailAdminModelForm):
                 if key.startswith(formset.prefix+'-') and key.endswith('-id'):
                     value = self.data.get(key)
                     if value and str(value) not in allowed:
-                        raise ValidationError('다른 지점의 시설 사진 배치를 수정할 수 없습니다.')
+                        raise ValidationError('다른 콘텐츠에 속한 사진 배치나 약력을 수정할 수 없습니다.')
         return data
     def is_valid(self):
         valid = super().is_valid()

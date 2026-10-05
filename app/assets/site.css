@@ -12,3 +12,6 @@ img { max-width: 100%; height: auto; border-radius: .4rem; }
 .photos { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap: 1rem; }
 figure { margin: 0; }
 footer { padding-block: 2rem; }
+.trainer-section { scroll-margin-top: 1rem; padding-block: 1rem; }
+.trainer-cards { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,18rem),1fr)); gap: 2rem; }
+.trainer-cards img { display: block; max-height: 24rem; object-fit: contain; }

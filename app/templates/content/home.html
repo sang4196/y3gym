@@ -8,5 +8,6 @@
 {% if site.introduction %}<section><h2>소개</h2><p class="text">{{ site.introduction }}</p></section>{% endif %}
 {% if site.introduction_image %}<img src="{{ site.introduction_image.url }}" alt="{{ site.introduction_image.alt }}" width="{{ site.introduction_image.width }}" height="{{ site.introduction_image.height }}">{% endif %}
 {% if branches %}<section><h2>지점 안내</h2>{% for branch in branches %}<article><h3><a href="/branches/#branch-{{ branch.id }}">{{ branch.name }}</a>{% if branch.is_main %} · 본점{% endif %}</h3>{% if branch.summary %}<p>{{ branch.summary }}</p>{% endif %}{% if branch.cover_image %}<img src="{{ branch.cover_image.url }}" alt="{{ branch.cover_image.alt }}" width="{{ branch.cover_image.width }}" height="{{ branch.cover_image.height }}">{% endif %}<p>{{ branch.address }}</p></article>{% endfor %}</section>{% endif %}
+{% if trainer_sections %}<section><h2>트레이너 소개</h2><p><a href="/trainers/">지점별 트레이너 보기</a></p></section>{% endif %}
 {% else %}<h1>사이트 소개를 준비 중입니다.</h1>{% endif %}
 {% endblock %}

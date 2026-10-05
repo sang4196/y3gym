@@ -204,7 +204,7 @@ class CmsTests(FixtureMixin,TestCase):
         self.assertEqual(response.status_code,200);a.refresh_from_db();self.assertIsNone(a.cover_image_id)
         self.assertEqual(self.client.post(self.admin_url(Branch,'edit',a),self.form_data(a)).status_code,403)
 
-class ConcurrencyTests(FixtureMixin,TransactionTestCase):
+class ConcurrencyMixin:
     def worker(self, action):
         close_old_connections()
         try:
@@ -221,6 +221,8 @@ class ConcurrencyTests(FixtureMixin,TransactionTestCase):
             results=list(pool.map(wrap,actions))
         self.assertEqual(len({r[1] for r in results}),len(actions))
         return [r[0] for r in results]
+
+class ConcurrencyTests(ConcurrencyMixin,FixtureMixin,TransactionTestCase):
     def test_concurrent_first_publication(self):
         a=self.branch();b=self.branch()
         def publish(pk):

@@ -1,0 +1,30 @@
+{% extends 'content/base.html' %}
+{% block title %}트레이너 소개{% endblock %}
+{% block content %}
+<h1>트레이너 소개</h1>
+{% if trainer_sections|length > 1 %}
+<nav aria-label="트레이너 소속 지점 바로가기">
+  {% for section in trainer_sections %}<a href="#branch-{{ section.branch.id }}">{{ section.branch.name }}</a>{% endfor %}
+</nav>
+{% endif %}
+{% for section in trainer_sections %}
+<section id="branch-{{ section.branch.id }}" class="trainer-section">
+  <h2>{{ section.branch.name }}{% if section.branch.is_main %} · 본점{% endif %}</h2>
+  <p><a href="{{ section.branch.page_path }}">이 지점 안내</a></p>
+  <div class="trainer-cards">
+  {% for trainer in section.trainers %}
+    <article>
+      <img src="{{ trainer.profile_image.url }}" alt="{{ trainer.profile_image.alt }}" width="{{ trainer.profile_image.width }}" height="{{ trainer.profile_image.height }}" loading="lazy">
+      <h3>{{ trainer.name }}</h3>
+      {% if trainer.job_title %}<p class="job-title">{{ trainer.job_title }}</p>{% endif %}
+      <p class="text">{{ trainer.short_intro }}</p>
+      {% for group in trainer.career_groups %}
+      <h4>{% if group.category == 'education' %}학력{% elif group.category == 'award' %}수상경력{% elif group.category == 'certification' %}자격증{% elif group.category == 'experience' %}주요 경력{% endif %}</h4>
+      <ul>{% for item in group.items %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% endfor %}
+    </article>
+  {% endfor %}
+  </div>
+</section>
+{% empty %}<p>공개된 트레이너 소개가 없습니다.</p>{% endfor %}
+{% endblock %}

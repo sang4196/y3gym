@@ -7,8 +7,10 @@ urlpatterns = [
     path('admin/',include(admin_urls)),
     path('',views.home,name='home'),
     path('branches/',views.branches,name='branches'),
+    path('trainers/',views.trainers,name='trainers'),
     path('api/v1/site/',views.site_api,name='site-api'),
     path('api/v1/branches/',views.branches_api,name='branches-api'),
+    path('api/v1/trainer-sections/',views.trainer_sections_api,name='trainer-sections-api'),
     path('images/display/<int:pk>/',views.display_image,name='display-image'),
     path('cms-files/<path:name>',views.private_file,name='private-file'),
 ]

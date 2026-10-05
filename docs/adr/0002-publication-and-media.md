@@ -13,6 +13,14 @@
 
 이미지 공개 조회는 Site/공개 Branch/BranchPhoto의 FK 기반 SQL EXISTS로 판정한다. Post 전체 리비전 O(n) 실험 스캔을 승격하지 않았다. 원본/내부 변환본은 인증과 컬렉션 권한 확인, 공개 표시본은 고정 변환과 매 요청 사용처 확인, 모두 no-store다. 로컬 파일 전달은 운영 프록시/스토리지 보호 검증을 대체하지 않는다. 정확한 RV 부분 결과·한계는 [DEV-01 보고서](../verification/dev-01.md)를 따른다. 아래 전체 RV/정책 상태 표는 최초 계획 이력이며 일괄 Accepted/PASS가 아니다.
 
+## DEV-02 한정 채택 기록 — 2026-10-05
+
+순차 개발 승인과 작업별 설계 지시에 따라 Trainer/Career의 P-01 현재값 즉시 반영·부모/약력 원자성, P-03 일반 운영자 영구삭제/파일덮어쓰기 금지·새 자산 참조, P-04 프로필과 지점이 모두 공개일 때만 사진 표시본 허용을 구현 기준으로 채택했다. 단일 소속·공개 필수 이름/지점/사진/한줄소개, 선택 직급/약력, 비공개 준비를 적용한다. 소속 이동은 같은 ID이며 지점 비공개가 Trainer 자체 공개/약력 데이터를 바꾸지 않는다. P-02의 지점 규칙은 유지한다.
+
+기존 콘텐츠 exclusive/shared advisory transaction lock을 Trainer+약력 저장, 지점별 projection·변환 전체에도 유지한다. stale edit_version과 타부모 약력ID를 관리자 폼/모델에서 거부한다. 이미지 판정은 Trainer.profile_image FK 및 Trainer.is_public/Branch.is_public의 SQL EXISTS를 추가한다. 기존 Site/Branch/사진과 공유하다 마지막 공개 사용처가 사라지는 접근 차단을 검증했다. 권한 확장은 기존 운영자 그룹에 add/change/view_trainer만 더하며 계정·암호·세션을 쓰지 않는다.
+
+RV-03·04·08~14/ENV-04에 연결되는 서버/DB 부분 검사와 실제 브라우저 NOT_RUN은 [DEV-02 보고서](../verification/dev-02.md)를 따른다. raw SQL/임의 ORM bulk update·하위 행 직접 저장은 지원하는 운영자 편집 경로가 아니며 이 경로의 전체 원자성을 보장하지 않는다. Post/Popup·운영 저장소/배포를 포함한 전체 Proposed 상태는 승격하지 않는다.
+
 ## 1. 배경
 
 지점·시설 사진과 트레이너·소속·약력은 함께 편집되지만 공개 버전의 단위가 불명확하면 미완성 내용이나 부분 변경이 노출될 수 있다. 최초 지점 준비와 운영 중 마지막 공개 지점의 비공개 전환도 구분해야 한다. 공개 API의 객체 필터링만으로 이미지 직접 URL을 보호할 수는 없다.

@@ -1,8 +1,8 @@
 """Shared public projection. No sessions, revisions, raw storage URLs or O(n) asset scans."""
 from django.conf import settings
-from django.db.models import Q, Exists, OuterRef
+from django.db.models import Q, Exists, OuterRef, Prefetch
 from wagtail.images import get_image_model
-from .models import SiteContent, Branch, BranchPhoto
+from .models import SiteContent, Branch, BranchPhoto, Trainer, TrainerCareer
 from .locking import content_transaction
 
 DISPLAY_FILTER = 'max-1200x900|format-png'
@@ -11,7 +11,8 @@ def public_images():
     site = SiteContent.objects.exclude(brand_name='').filter(Q(logo_id=OuterRef('pk'))|Q(hero_image_id=OuterRef('pk'))|Q(introduction_image_id=OuterRef('pk')))
     branches = Branch.objects.filter(is_public=True, cover_image_id=OuterRef('pk'))
     photos = BranchPhoto.objects.filter(branch__is_public=True, image_id=OuterRef('pk'))
-    return get_image_model().objects.alias(site_use=Exists(site), branch_use=Exists(branches), photo_use=Exists(photos)).filter(Q(site_use=True)|Q(branch_use=True)|Q(photo_use=True))
+    trainers = Trainer.objects.filter(is_public=True, branch__is_public=True, profile_image_id=OuterRef('pk'))
+    return get_image_model().objects.alias(site_use=Exists(site), branch_use=Exists(branches), photo_use=Exists(photos), trainer_use=Exists(trainers)).filter(Q(site_use=True)|Q(branch_use=True)|Q(photo_use=True)|Q(trainer_use=True))
 
 def image_dto(image, alt=''):
     if image is None: return None
@@ -28,11 +29,29 @@ def site_dto(site):
 def branch_dto(branch):
     import re
     phone = {'display':branch.phone, 'href':'tel:'+re.sub(r'[^+0-9]', '', branch.phone)} if branch.phone else None
-    return {'id':str(branch.pk), 'name':branch.name, 'is_main':branch.is_main, 'summary':optional(branch.summary), 'cover_image':image_dto(branch.cover_image,branch.cover_alt), 'address':branch.address, 'address_detail':optional(branch.address_detail), 'phone':phone, 'kakao_channel_url':optional(branch.kakao_channel_url), 'business_hours':optional(branch.business_hours), 'closed_days':optional(branch.closed_days), 'parking_info':optional(branch.parking_info), 'usage_notes':optional(branch.usage_notes), 'location':None, 'trainer_section_path':None, 'facility_photos':[{'image':image_dto(photo.image,photo.alt),'caption':optional(photo.caption)} for photo in branch.photos.all()]}
+    return {'id':str(branch.pk), 'name':branch.name, 'is_main':branch.is_main, 'summary':optional(branch.summary), 'cover_image':image_dto(branch.cover_image,branch.cover_alt), 'address':branch.address, 'address_detail':optional(branch.address_detail), 'phone':phone, 'kakao_channel_url':optional(branch.kakao_channel_url), 'business_hours':optional(branch.business_hours), 'closed_days':optional(branch.closed_days), 'parking_info':optional(branch.parking_info), 'usage_notes':optional(branch.usage_notes), 'location':None, 'trainer_section_path':f'/trainers/#branch-{branch.pk}' if branch.public_trainers else None, 'facility_photos':[{'image':image_dto(photo.image,photo.alt),'caption':optional(photo.caption)} for photo in branch.photos.all()]}
+
+def trainer_dto(trainer):
+    groups = {category: [] for category in TrainerCareer.Category.values}
+    for career in trainer.careers.all():
+        groups[career.category].append(career.text)
+    return {
+        'id': str(trainer.pk), 'name': trainer.name, 'job_title': optional(trainer.job_title),
+        'profile_image': image_dto(trainer.profile_image, trainer.profile_alt),
+        'short_intro': trainer.short_intro,
+        'career_groups': [{'category': category, 'items': items} for category, items in groups.items() if items],
+    }
+
+def trainer_section_dto(branch):
+    return {
+        'branch': {'id': str(branch.pk), 'name': branch.name, 'is_main': branch.is_main, 'page_path': f'/branches/#branch-{branch.pk}'},
+        'trainers': [trainer_dto(trainer) for trainer in branch.public_trainers],
+    }
 
 def public_snapshot():
     # All queries, child rows and DTO materialization complete under shared lock.
     with content_transaction(read=True):
         site = SiteContent.objects.select_related('logo','hero_image','introduction_image').first()
-        branches = Branch.objects.filter(is_public=True).select_related('cover_image').prefetch_related('photos__image')
-        return {'site':site_dto(site), 'branches':[branch_dto(branch) for branch in branches]}
+        trainers = Trainer.objects.filter(is_public=True).select_related('profile_image').prefetch_related('careers')
+        branches = list(Branch.objects.filter(is_public=True).select_related('cover_image').prefetch_related('photos__image', Prefetch('trainers', queryset=trainers, to_attr='public_trainers')))
+        return {'site':site_dto(site), 'branches':[branch_dto(branch) for branch in branches], 'trainer_sections':[trainer_section_dto(branch) for branch in branches if branch.public_trainers]}
