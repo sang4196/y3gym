@@ -1,5 +1,13 @@
 # DEV-01~04·06 — 콘텐츠 관리·공개 홈페이지
 
+## DEV-05-B 로컬 적용 (2026-10-05)
+
+입력 기본주소에 대한 운영자 확인 상태만 저장하고, 지도 결과를 저장하지 않는 Wagtail 주소 확인·공개 지도 표시를 준비했다. 기본주소 변경은 확인 해제, 상세주소는 유지하며 기존 권한·CSRF·버전/원자성을 유지한다. 공개 location=null, map은 확인된 공개 지점의 자체 주소만 제공한다. 표시할 때 공식 SDK로 새 조회하고 결과는 현재 지도에만 사용한다.
+
+관련40개(33PG/HTML+7mock)/17.681s 및 보강한 전용10개/3.869s, 최종 map 계약3개/0.261s와 fake SDK18개/142.474802ms PASS. 중복 실행 테스트를 합산하지 않는다. additive0005로 기존 지점1·2에 미확인False만 추가했고 기존 콘텐츠·계정 메타데이터/권한·미디어13·SPIKE31·DEV-07-B 자료/receipt를 보존했다. 현재 제품 PID544255/127.0.0.1:8766 유지, PG456028/SPIKE452717 유지.
+
+지도 설정은 계속 disabled/공개 식별값 빈 값이다. 실제 키·API·브라우저/위치·고지/동의·운영 환경은 미검증이다. 전체 DEV-05/제품 완료·정책 전체 채택이 아니다. DEV-07-B는 c221e08b230eee2aa213e23c473e5fb0d2e062d5로 검토·정상 push 완료했다. 아래 PID와 정책 미확인·Git 대기는 이전 이력이다. [DEV-05-B 보고서](../docs/verification/dev-05-b.md)에 실제 근거·제약과 검토 인계를 기록한다.
+
 ## DEV-07-B 임시 통합 확인 자료 (2026-10-05)
 
 사용자의 Q-03 승인에 따라 기존 콘텐츠를 보존하면서 비어 있던 트레이너·공지/이벤트·팝업에만 새 TEST 자료를 추가했다. 기존 공개 본점에 임시 트레이너2명/약력2개, 임시 공지·이벤트 각1건, 공지에 연결한7일 팝업1개와 합성PNG3개다. 실제 인물/자격/행사 정보가 아니다. 기존 create_dev_demo/초기화/seed를 재실행하지 않았다.
@@ -189,3 +197,14 @@ python3 scripts/local_pg.py stop
 ```
 
 이는 프로젝트 pg-data의 pg_ctl만 사용한다. DB·미디어·로그·venv를 지우지 않는다. 운영용 백업/복원·HTTPS/프록시/배포는 아직 검증하지 않았다.
+
+## DEV-05-B 지도 설정·관련 검사
+
+현재 `NAVER_MAPS_ENABLED=False`, `NAVER_MAPS_PUBLIC_KEY_ID=''`를 유지한다. 실제 환경/비밀 파일을 읽지 않고 준비했다. 후속 명시적 활성화 때 설정 모듈의 두 값을 구성한다. True와 공개 SDK 식별값(ASCII 영숫자/밑줄/하이픈1~128자)이 모두 유효할 때만 표시 가능하며 Secret을 넣지 않는다. 계정/API·등록 URL·요금/쿼터·런칭 고지/동의·실제 브라우저 확인은 별도 단계다. 서버 REST 호출 경로는 없다.
+
+```bash
+.venv/bin/python manage.py test content.test_address_confirmation content.test_naver_maps content.tests content.test_presentation --settings=config.settings.test --noinput -v 2
+node --test tests/naver-maps.test.cjs
+```
+
+`content.0005_branch_address_confirmed`는 현재 개발 DB에 이미 적용했다. 기존 주소·버전은 유지되고 지점1·2 모두 미확인이다. 실제 키가 없으므로 운영자는 주소 저장을 계속할 수 있지만 위치 확인은 할 수 없다. 임시 생성 명령/seed를 재실행하지 않는다. 제공자 응답·좌표는 DB/캐시/세션/브라우저 저장소/hidden input에 넣지 않는다.

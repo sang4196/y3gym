@@ -124,26 +124,28 @@ class MapPageTests(TestCase):
                 self.assertNotContains(response,'naver-maps.js')
             transport.assert_not_called()
 
-    def test_default_disabled_even_for_future_confirmed_dto(self):
-        dto=[{'id':'1','location':{'latitude':37.2,'longitude':127.1}}]
+    def test_configuration_and_map_spec_fail_closed(self):
+        dto=[{'id':'1','address':'TEST address','map':{'provider':'naver','query':'TEST address'}}]
         self.assertIsNone(page_config(dto))
         self.assertIsNone(page_config(dto,enabled=True,key_id=''))
-        for loc in [None,{'latitude':True,'longitude':127.1},{'latitude':float('nan'),'longitude':127.1},{'latitude':91,'longitude':127}, {'latitude':37,'longitude':127,'secret':'TEST'}]:
-            self.assertIsNone(page_config([{'id':'1','location':loc}],enabled=True,key_id='TEST'))
+        self.assertEqual(page_config(dto,enabled=True,key_id='TEST'),{'keyId':'TEST','items':[{'id':'1','query':'TEST address'}]})
+        for spec in [None, {}, {'provider':'other','query':'TEST address'}, {'provider':'naver','query':'OLD'}, {'provider':'naver','query':True}]:
+            self.assertIsNone(page_config([{'id':'1','address':'TEST address','map':spec}],enabled=True,key_id='TEST'))
 
     @override_settings(NAVER_MAPS_ENABLED=True,NAVER_MAPS_PUBLIC_KEY_ID='TEST_PUBLIC')
-    def test_future_page_contract_escapes_and_whitelists_only_public_coordinates(self):
+    def test_page_contract_escapes_and_whitelists_only_own_address(self):
         from .publication import public_snapshot
         snapshot=public_snapshot()
         dto=snapshot['branches'][0]
-        dto['location']={'latitude':37.2,'longitude':127.1}
+        dto['map']={'provider':'naver','query':dto['address']}
+        dto['location']=None
         dto['name']='TEST </script><script>attack</script>'
         dto['provider_raw']='TEST PRIVATE PROVIDER';dto['secret']='TEST SECRET'
         with patch('content.views.public_snapshot',return_value=snapshot), patch('content.naver_maps.http.client.HTTPSConnection') as transport:
             response=self.client.get('/branches/')
         soup=BeautifulSoup(response.content,'html.parser')
         config=json.loads(soup.select_one('#naver-map-config').string)
-        self.assertEqual(config,{'keyId':'TEST_PUBLIC','items':[{'id':str(self.branch.pk),'location':dto['location']}]})
+        self.assertEqual(config,{'keyId':'TEST_PUBLIC','items':[{'id':str(self.branch.pk),'query':dto['address']}]})
         self.assertEqual(len(soup.select('script[src="/static/naver-maps.js"]')),1)
         self.assertTrue(soup.select_one('#naver-map-'+str(self.branch.pk)).has_attr('hidden'))
         self.assertNotContains(response,'TEST PRIVATE PROVIDER');self.assertNotContains(response,'TEST SECRET')

@@ -1,7 +1,7 @@
 """DEV-05-A preparation only: no endpoint, persistence or environment key reader.
 
 Callers must explicitly enable GeocodingConfig. No current product caller does.
-Provider results are transient and must not be saved until policy is resolved.
+DEV-05-B forbids persisting or reusing provider results. This adapter remains unused.
 """
 from dataclasses import dataclass, field
 import http.client
@@ -125,13 +125,23 @@ def geocode(address, config=None):
             connection.close()
 
 
+def display_key():
+    """Public SDK ID only. No environment/credential reader or REST secret."""
+    from django.conf import settings
+    value = settings.NAVER_MAPS_PUBLIC_KEY_ID
+    return value if settings.NAVER_MAPS_ENABLED is True and isinstance(value, str) and KEY_ID.fullmatch(value) else ''
+
+
 def page_config(branches, *, enabled=False, key_id=''):
-    """Whitelist public page data only; never accept a GeocodingConfig/secret."""
+    """Only own confirmed public address content, never provider results."""
     if enabled is not True or not isinstance(key_id, str) or not KEY_ID.fullmatch(key_id):
         return None
     items = []
     for branch in branches:
-        pk, location = branch.get('id'), branch.get('location')
-        if isinstance(pk, str) and re.fullmatch(r'[1-9][0-9]*', pk) and valid_location(location):
-            items.append({'id': pk, 'location': dict(location)})
+        pk, spec = branch.get('id'), branch.get('map')
+        if (isinstance(pk, str) and re.fullmatch(r'[1-9][0-9]*', pk)
+                and isinstance(spec, dict) and spec.get('provider') == 'naver'
+                and isinstance(spec.get('query'), str) and spec['query'] == branch.get('address')
+                and 0 < len(spec['query']) <= 255 and not any(ord(c) < 32 for c in spec['query'])):
+            items.append({'id': pk, 'query': spec['query']})
     return {'keyId': key_id, 'items': items} if items else None
