@@ -1,5 +1,5 @@
 {% extends 'content/base.html' %}{% block content %}
-<div class="page-heading"><h1>트레이너 소개</h1>{% if trainer_sections %}<p>소속 지점별 프로필과 약력을 확인하세요.</p>{% endif %}</div>
+<div class="page-heading"><p class="section-label" aria-hidden="true">TRAINERS</p><h1>트레이너 소개</h1>{% if trainer_sections %}<p>소속 지점별 프로필과 약력을 확인하세요.</p>{% endif %}</div>
 {% if trainer_sections|length > 1 %}<nav class="anchor-nav" aria-label="트레이너 소속 지점 바로가기">{% for section in trainer_sections %}<a href="#branch-{{ section.branch.id }}">{{ section.branch.name }}</a>{% endfor %}</nav>{% endif %}
 {% for section in trainer_sections %}
 <section id="branch-{{ section.branch.id }}" class="section trainer-section" aria-labelledby="trainer-branch-{{ section.branch.id }}" tabindex="-1">

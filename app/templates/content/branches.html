@@ -1,5 +1,5 @@
 {% extends 'content/base.html' %}{% load static %}{% block content %}
-<div class="page-heading"><h1>지점 안내</h1>{% if branches %}<p>지점별 위치와 이용안내를 확인하세요.</p>{% endif %}</div>
+<div class="page-heading"><p class="section-label" aria-hidden="true">BRANCHES</p><h1>지점 안내</h1>{% if branches %}<p>지점별 위치와 이용안내를 확인하세요.</p>{% endif %}</div>
 {% if branches|length > 1 %}<nav class="anchor-nav" aria-label="지점 바로가기">{% for branch in branches %}<a href="#branch-{{ branch.id }}">{{ branch.name }}</a>{% endfor %}</nav>{% endif %}
 {% for branch in branches %}
 <article id="branch-{{ branch.id }}" class="section branch-detail" aria-labelledby="branch-title-{{ branch.id }}" tabindex="-1">

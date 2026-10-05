@@ -163,3 +163,27 @@ class PresentationTests(PostFixture, TestCase):
     def test_excerpt_does_not_emit_markup_or_join_block_words(self):
         self.assertEqual(excerpt('<h2>제목</h2><p>앞<strong>중간</strong>끝<br>다음</p><script>숨김</script>',html=True),'제목 앞중간끝 다음')
         self.assertEqual(excerpt('TEST <일반 텍스트> & "값"'),'TEST <일반 텍스트> & "값"')
+
+    def test_long_content_and_missing_hero_keep_input_and_navigation_without_new_assets(self):
+        # Preserve user-authored values; layout must not replace/truncate them.
+        self.site.brand_name='TEST '+('긴브랜드'*18)
+        self.site.hero_title='TEST '+('긴제목'*45)
+        self.site.hero_description='TEST '+('설명 '*100)
+        self.site.hero_image=None;self.site.save()
+        branch=self.branch(is_public=True)
+        branch.address='TEST '+('긴주소 '*40);branch.save()
+        home=self.soup('/')
+        self.assertEqual(home.select_one('h1').text,self.site.hero_title)
+        self.assertIn(self.site.hero_description,home.get_text())
+        self.assertIn(branch.address,home.get_text())
+        self.assertIsNone(home.select_one('.hero-image'))
+        self.assertIn('대표 사진을 준비 중입니다.',home.get_text())
+        self.assertTrue(all(not tag.get('src','').startswith('http') for tag in home.select('script')))
+        self.assertIsNone(home.select_one('link[href^="https://"], iframe'))
+        menu=home.select_one('header nav')
+        self.assertEqual([a['href'] for a in menu.select('a')],['/','/branches/','/posts/'])
+        self.assertFalse(menu.select('[hidden], [aria-hidden="true"]'))
+        self.site.hero_image=self.image;self.site.save()
+        with_photo=self.soup('/')
+        self.assertEqual(with_photo.select_one('.hero-image')['src'],f'http://testserver/images/display/{self.image.pk}/')
+        self.assertNotIn('대표 사진을 준비 중입니다.',with_photo.get_text())
